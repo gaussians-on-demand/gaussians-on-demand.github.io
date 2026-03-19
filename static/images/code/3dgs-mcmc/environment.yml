@@ -1,0 +1,19 @@
+name: mcmc_3dgs
+channels:
+  - pytorch
+  - conda-forge
+  - defaults
+dependencies:
+  - cudatoolkit=11.7
+  - plyfile
+  - python=3.8
+  - pytorch=1.13.1
+  - torchaudio=0.13.1
+  - torchvision=0.14.1
+  - tqdm
+  - pip:
+    - lpips
+    - submodules/mcmc-diff-gaussian-rasterization
+    - submodules/reduced-diff-gaussian-rasterization
+    - submodules/simple-knn
+    - submodules/reduced-simple-knn

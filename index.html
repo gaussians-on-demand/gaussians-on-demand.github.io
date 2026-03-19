@@ -1,0 +1,3289 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <title>GoDe: Gaussians on Demand</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.0/css/bootstrap.min.css">
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,500,600" rel="stylesheet"
+        type="text/css">
+    <style>
+        body {
+            font-family: 'Helvetica Neue', Helvetica, 'Source Sans Pro', Arial, sans-serif;
+            background: #f7f8fc;
+            color: #1a1a2e;
+        }
+
+        /* ── Header ── */
+        .site-header {
+            background: #fff;
+            padding: 44px 0 28px;
+            border-bottom: 1px solid #e8eaf0;
+        }
+
+        .site-header h1 {
+            font-size: 2rem;
+            font-weight: 800;
+            letter-spacing: -0.01em;
+            margin-bottom: 4px;
+            color: #0f172a;
+        }
+
+        .site-header h4 {
+            font-size: 1.05rem;
+            font-weight: 400;
+            color: #64748b;
+        }
+
+        .author-container a {
+            color: #1e40af;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .author-container a:hover {
+            text-decoration: underline;
+        }
+
+        .author-container sup {
+            color: #2563eb;
+            font-size: 0.72em;
+        }
+
+        .affiliations sup {
+            color: #2563eb;
+        }
+
+        .affiliations h6 {
+            font-size: 0.82rem;
+            color: #475569;
+        }
+
+        /* affiliation logos — compact inline row */
+        .affil-logos {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            margin-top: 14px;
+        }
+
+        .affil-logos img {
+            height: 64px;
+            width: auto;
+            object-fit: contain;
+            filter: grayscale(20%);
+            opacity: 0.85;
+            transition: opacity 0.2s;
+        }
+
+        .affil-logos img:hover {
+            opacity: 1;
+            filter: none;
+        }
+
+        /* ── Buttons ── */
+        .resource-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            background: var(--btn-bg, #fff);
+            border: 1.5px solid var(--btn-border, #e0e5f0);
+            border-radius: 8px;
+            padding: 8px 20px;
+            color: var(--btn-color, #1a1a2e);
+            font-size: 0.88rem;
+            font-weight: 600;
+            text-decoration: none;
+            margin: 4px 5px;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.07);
+            transition: all 0.16s ease;
+        }
+
+        .resource-btn:hover {
+            background: var(--btn-color, #1e40af);
+            border-color: var(--btn-color, #1e40af);
+            color: #fff;
+            text-decoration: none;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .resource-btn:hover svg {
+            filter: brightness(10);
+        }
+
+        /* ── Section wrapper ── */
+        .section-card {
+            background: #fff;
+            border-radius: 14px;
+            padding: 32px 36px;
+            margin-bottom: 24px;
+            box-shadow: 0 1px 12px rgba(0, 0, 0, 0.05);
+            border: 1px solid #eef0f8;
+        }
+
+        @media (max-width: 576px) {
+            .section-card {
+                padding: 22px 16px;
+            }
+        }
+
+        .section-line {
+            border: none;
+            height: 3px;
+            background: linear-gradient(90deg, #2563eb 0%, #7c3aed 60%, transparent 100%);
+            margin-bottom: 20px;
+            border-radius: 2px;
+        }
+
+        h2.section-title {
+            font-weight: 800;
+            font-size: 1.45rem;
+            margin-bottom: 6px;
+            color: #0f172a;
+        }
+
+        /* ── Text ── */
+        .abstract-text {
+            font-size: 0.97rem;
+            line-height: 1.8;
+            color: #374151;
+            font-style: italic;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .body-text {
+            font-size: 0.93rem;
+            line-height: 1.75;
+            color: #475569;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .fig-caption {
+            font-size: 0.84rem;
+            color: #64748b;
+            font-style: italic;
+            margin-top: 9px;
+        }
+
+        /* ── Contribution cards ── */
+        .contrib-card {
+            border: 1.5px solid #e8edf8;
+            border-radius: 12px;
+            padding: 20px 18px 16px;
+            background: #fff;
+            height: 100%;
+            box-shadow: 0 1px 8px rgba(0, 0, 0, 0.05);
+            transition: box-shadow 0.2s, transform 0.2s;
+        }
+
+        .contrib-card:hover {
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.09);
+            transform: translateY(-2px);
+        }
+
+        .contrib-icon-wrap {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            margin-bottom: 12px;
+        }
+
+        .contrib-card h5 {
+            font-weight: 700;
+            font-size: 0.92rem;
+            margin-bottom: 6px;
+            color: #0f172a;
+        }
+
+        .contrib-card p {
+            font-size: 0.83rem;
+            color: #64748b;
+            margin: 0;
+            line-height: 1.55;
+        }
+
+        /* ── LoD Viewer ── */
+        .lod-viewer {
+            background: #fff;
+            border: 1.5px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 13px 13px 11px;
+            transition: box-shadow .18s, border-color .18s;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .lod-viewer:hover {
+            box-shadow: 0 4px 16px rgba(0, 0, 0, .07);
+            border-color: var(--sc, #2563eb);
+        }
+
+        .lod-scene-title {
+            font-size: .85rem;
+            font-weight: 700;
+            color: #0f172a;
+            margin: 0 0 9px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .lod-scene-title::before {
+            content: '';
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--sc, #2563eb);
+            flex-shrink: 0;
+        }
+
+        .lod-ctrl {
+            margin-bottom: 7px;
+        }
+
+        .lod-ctrl-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+
+        .lod-ctrl-label {
+            font-size: .64rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .08em;
+            color: #9ca3af;
+        }
+
+        .lod-pill {
+            background: var(--sc, #2563eb);
+            color: #fff;
+            font-size: .68rem;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 100px;
+            min-width: 40px;
+            text-align: center;
+        }
+
+        .lod-range {
+            -webkit-appearance: none;
+            appearance: none;
+            display: block;
+            width: 100%;
+            height: 4px;
+            background: #e5e7eb;
+            border-radius: 2px;
+            outline: none;
+            cursor: pointer;
+            accent-color: var(--sc, #2563eb);
+        }
+
+        .lod-range::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            background: var(--sc, #2563eb);
+            cursor: pointer;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, .2);
+        }
+
+        .lod-range::-moz-range-thumb {
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            background: var(--sc, #2563eb);
+            cursor: pointer;
+            border: none;
+        }
+
+        .lod-ticks {
+            display: flex;
+            justify-content: space-between;
+            padding: 2px 1px 0;
+        }
+
+        .lod-ticks span {
+            font-size: .58rem;
+            color: #d1d5db;
+            font-weight: 600;
+        }
+
+        .lod-ticks span:first-child,
+        .lod-ticks span:last-child {
+            color: #9ca3af;
+        }
+
+        .lod-frame {
+            position: relative;
+            width: 100%;
+            padding-bottom: 56.25%;
+            overflow: hidden;
+            border-radius: 7px;
+            background: #f3f4f6;
+            flex-shrink: 0;
+        }
+
+        .lod-slide {
+            display: none;
+            position: absolute;
+            inset: 0;
+        }
+
+        .lod-slide.active {
+            display: block;
+        }
+
+        .lod-slide img {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .lod-stats {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 8px;
+            padding-top: 7px;
+            border-top: 1px solid #f3f4f6;
+            flex-wrap: wrap;
+            gap: 3px;
+        }
+
+        .lod-stat {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-width: 44px;
+        }
+
+        .lod-stat-v {
+            font-size: .78rem;
+            font-weight: 700;
+            color: var(--sc, #2563eb);
+            line-height: 1.2;
+        }
+
+        .lod-stat-k {
+            font-size: .55rem;
+            font-weight: 700;
+            color: #9ca3af;
+            text-transform: uppercase;
+            letter-spacing: .06em;
+        }
+
+        .lod-ds-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: .68rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: .12em;
+            color: var(--dc, #2563eb);
+            margin: 22px 0 10px;
+            padding-bottom: 6px;
+            border-bottom: 2px solid var(--dc, #2563eb);
+        }
+
+        .lod-ds-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--dc, #2563eb);
+            flex-shrink: 0;
+        }
+
+        .lod-row {
+            display: flex;
+            flex-wrap: wrap;
+            margin: 0 -10px;
+        }
+
+        .lod-col {
+            width: 50%;
+            padding: 0 10px 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        @media (max-width: 575.98px) {
+            .lod-col {
+                width: 100%;
+            }
+        }
+
+        /* ── Comparison & Performance tables ── */
+        .comp-tabs .nav-link {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #64748b;
+            border: 1.5px solid transparent;
+            border-radius: 7px 7px 0 0;
+            padding: 7px 15px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .comp-tabs .nav-link.active {
+            color: #0f172a;
+            background: #fff;
+            border-color: #e5e7eb #e5e7eb #fff;
+        }
+
+        .comp-tab-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            display: inline-block;
+            flex-shrink: 0;
+        }
+
+        .comp-tab-content {
+            border: 1.5px solid #e5e7eb;
+            border-top: none;
+            border-radius: 0 0 9px 9px;
+            background: #fff;
+        }
+
+        .comp-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.76rem;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        }
+
+        .comp-table th,
+        .comp-table td {
+            padding: 5px 9px;
+            border-bottom: 1px solid #f3f4f6;
+            white-space: nowrap;
+            text-align: right;
+        }
+
+        .comp-table th {
+            text-align: center;
+        }
+
+        .comp-table thead tr:first-child th {
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        .comp-table thead tr:last-child th {
+            border-bottom: 2px solid #0f172a;
+            background: #f8fafc;
+            font-weight: 700;
+            font-size: 0.7rem;
+            letter-spacing: 0.04em;
+            color: #374151;
+        }
+
+        .t-th-dataset {
+            background: #f0f6ff;
+            color: #1d4ed8;
+            font-weight: 800;
+            font-size: 0.76rem;
+            text-align: center;
+            border-bottom: 2px solid #bfdbfe !important;
+        }
+
+        .t-th-method,
+        .t-th-level,
+        .t-th-scalable {
+            background: #f8fafc;
+            text-align: left;
+        }
+
+        .t-method-name {
+            text-align: left;
+            font-weight: 700;
+            color: #0f172a;
+            vertical-align: middle;
+            padding-left: 11px;
+        }
+
+        .t-ours-badge {
+            font-size: 0.6rem;
+            font-weight: 700;
+            color: #fff;
+            padding: 1px 5px;
+            border-radius: 3px;
+            margin-right: 2px;
+            vertical-align: middle;
+        }
+
+        .t-level {
+            text-align: center;
+            color: #6b7280;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+        .t-scalable {
+            text-align: center;
+            font-weight: 700;
+            font-size: 0.82rem;
+        }
+
+        .t-yes {
+            color: #16a34a;
+        }
+
+        .t-no {
+            color: #d1d5db;
+        }
+
+        .t-best {
+            background: #fde8e8 !important;
+            font-weight: 700;
+            color: #b91c1c;
+        }
+
+        .t-second {
+            background: #fef9c3 !important;
+            font-weight: 600;
+            color: #854d0e;
+        }
+
+        .comp-table tbody tr:hover {
+            background: #f0f7ff !important;
+        }
+
+        .t-best-legend {
+            background: #fde8e8;
+            color: #b91c1c;
+            padding: 0 4px;
+            border-radius: 3px;
+            font-weight: 700;
+        }
+
+        .t-second-legend {
+            background: #fef9c3;
+            color: #854d0e;
+            padding: 0 4px;
+            border-radius: 3px;
+            font-weight: 600;
+        }
+
+        /* ── Video ── */
+        .video-wrap {
+            width: 100%;
+            border-radius: 9px;
+            overflow: hidden;
+            background: #000;
+        }
+
+        .video-wrap video {
+            display: block;
+            width: 100%;
+            height: auto;
+        }
+
+        /* ── Citation ── */
+        .citation-block {
+            background: #f8faff;
+            border: 1.5px solid #dde8f8;
+            border-radius: 10px;
+            padding: 20px 26px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.82rem;
+            line-height: 1.75;
+            position: relative;
+            white-space: pre-wrap;
+            box-shadow: 0 1px 8px rgba(0, 0, 0, 0.04);
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 11px;
+            right: 12px;
+            background: #fff;
+            border: 1px solid #cbd5e1;
+            border-radius: 5px;
+            padding: 3px 11px;
+            font-size: 0.76rem;
+            cursor: pointer;
+            font-family: 'Helvetica Neue', sans-serif;
+            transition: border-color 0.2s, color 0.2s;
+        }
+
+        .copy-btn:hover {
+            border-color: #2563eb;
+            color: #2563eb;
+        }
+
+        /* ── Footer ── */
+        footer {
+            background: #f1f5f9;
+            border-top: 1px solid #e2e8f0;
+            padding: 24px 0;
+            color: #94a3b8;
+            font-size: 0.82rem;
+        }
+
+        footer a {
+            color: #94a3b8;
+        }
+
+        footer a:hover {
+            color: #2563eb;
+        }
+
+        /* ── Placeholder ── */
+        .placeholder-fig {
+            width: 100%;
+            background: #f1f5f9;
+            border: 2px dashed #cbd5e1;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #94a3b8;
+            font-size: 0.85rem;
+            font-style: italic;
+            text-align: center;
+            padding: 10px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ═══════════ HEADER ═══════════ -->
+    <div class="site-header">
+        <div class="container text-center">
+            <h1>GoDe: Gaussians on Demand</h1>
+            <h4 class="mb-3">for Progressive Level-of-Detail and Scalable Compression</h4>
+
+            <div class="author-container">
+                <div class="row justify-content-center">
+                    <div class="col-auto mb-1">
+                        <h6><a href="https://scholar.google.com/citations?user=wjOMl_8AAAAJ&hl=en&oi=ao"
+                                target="_blank">Francesco Di Sario<sup>1,2*</sup></a></h6>
+                    </div>
+                    <div class="col-auto mb-1">
+                        <h6><a href="https://scholar.google.com/citations?user=JlAby_oAAAAJ&hl=en&oi=ao"
+                                target="_blank">Riccardo Renzulli<sup>1</sup></a></h6>
+                    </div>
+                    <div class="col-auto mb-1">
+                        <h6><a href="https://scholar.google.com/citations?user=Pt1gmQYAAAAJ" target="_blank">Marco
+                                Grangetto<sup>1</sup></a></h6>
+                    </div>
+                    <div class="col-auto mb-1">
+                        <h6><a href="https://scholar.google.com/citations?user=r7ZaWDUAAAAJ&hl=en&oi=ao"
+                                target="_blank">Akihiro Sugimoto<sup>2</sup></a></h6>
+                    </div>
+                    <div class="col-auto mb-1">
+                        <h6><a href="https://scholar.google.com/citations?user=uKuvN64AAAAJ&hl=en&oi=ao"
+                                target="_blank">Enzo Tartaglione<sup>3</sup></a></h6>
+                    </div>
+                </div>
+                <div class="row justify-content-center mt-1 affiliations">
+                    <div class="col-auto text-center mb-1">
+                        <h6><sup>1</sup>University of Turin</h6>
+                    </div>
+                    <div class="col-auto text-center mb-1">
+                        <h6><sup>2</sup>National Institute of Informatics</h6>
+                    </div>
+                    <div class="col-auto text-center mb-1">
+                        <h6><sup>3</sup>Télécom Paris, Institut Polytechnique de Paris</h6>
+                    </div>
+                </div>
+                <div class="affil-logos">
+                    <img src="static/images/unito.png" alt="Università di Torino">
+                    <img src="static/images/nii_logo.png" alt="NII">
+                    <img src="static/images/telecom_logo.png" alt="Télécom Paris">
+                </div>
+                <p class="text-center mt-2" style="font-size:0.82rem; color:#94a3b8;">
+                    *Corresponding author: <a href="mailto:francesco.disario@unito.it"
+                        style="color:#2563eb;">francesco.disario@unito.it</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Links -->
+    <div class="container text-center my-3">
+        <a href="GoDe.pdf" download class="resource-btn" style="--btn-color:#dc2626; --btn-bg:#fff5f5; --btn-border:#fecaca;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                <polyline points="14 2 14 8 20 8" />
+                <line x1="16" y1="13" x2="8" y2="13" />
+                <line x1="16" y1="17" x2="8" y2="17" />
+            </svg>Paper
+        </a>
+        <a href="#" class="resource-btn" style="--btn-color:#0f172a; --btn-bg:#f8fafc; --btn-border:#e2e8f0;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="#0f172a">
+                <path
+                    d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z" />
+            </svg>Code
+        </a>
+        <a href="https://arxiv.org/abs/2501.13558" target="_blank" class="resource-btn"
+            style="--btn-color:#b45309; --btn-bg:#fffbeb; --btn-border:#fde68a;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                <rect x="2" y="2" width="20" height="20" rx="4" fill="#b45309" />
+                <text x="3.5" y="16" font-family="serif" font-weight="bold" font-size="11" fill="#fff">ar</text>
+                <text x="13" y="16" font-family="serif" font-style="italic" font-size="11" fill="#fff">Xiv</text>
+            </svg>arXiv
+        </a>
+    </div>
+
+
+    <!-- ═══════════ TEASER VIDEO ═══════════ -->
+    <div class="container mb-4">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="video-wrap">
+                    <video muted loop playsinline autoplay>
+                        <source src="static/videos/teaser.mp4" type="video/mp4">
+                    </video>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ═══════════ TEASER IMAGE ═══════════ -->
+    <div class="container mb-4">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <img src="static/images/teaser.png"
+                    style="width:100%; height:auto; display:block; border-radius:10px; border:1px solid #e5e7eb;">
+                <p class="fig-caption text-center mt-2" style="max-width:860px; margin:0 auto;">
+                    <strong>Fig. 1:</strong> Our method builds a progressive Gaussian hierarchy enabling adaptive
+                    levels of detail (LoD). Combined with compression, it supports multiple rates from a
+                    <em>single trained model</em> — no retraining required.
+                </p>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ═══════════ ABSTRACT ═══════════ -->
+    <div class="container mb-4">
+        <div class="section-card">
+            <hr class="section-line">
+            <h2 class="section-title">Abstract</h2>
+            <p class="abstract-text" style="max-width:860px;">
+                Recent progress in compressing explicit radiance field representations, and in particular
+                <strong>3D Gaussian Splatting</strong>, has substantially reduced memory consumption while further
+                improving
+                real-time rendering performance. Despite these advances, existing approaches are inherently
+                <em>single-rate</em>: each target compression level is obtained through a separately optimized model,
+                resulting in a collection of fixed operating points rather than a truly scalable representation.
+            </p>
+            <p class="abstract-text mt-3" style="max-width:860px;">
+                We argue that scalable compression should be formulated as an intrinsic property of the representation
+                itself. Building on this observation, we introduce <strong>GoDe (Gaussians on Demand)</strong>, a
+                general
+                framework for scalable compression and progressive level-of-detail control. Starting from a single
+                trained model, GoDe reorganizes Gaussian primitives into a fixed progressive hierarchy that supports
+                multiple discrete rate–distortion operating points <strong>without retraining or per-level
+                    fine-tuning</strong>.
+            </p>
+        </div>
+    </div>
+
+
+    <!-- ═══════════ CONTRIBUTIONS ═══════════ -->
+    <div class="container mb-4">
+        <div class="section-card">
+            <hr class="section-line">
+            <h2 class="section-title">Contributions</h2>
+            <div class="row mt-3">
+                <div class="col-md-6 mb-3">
+                    <div class="contrib-card">
+                        <div class="contrib-icon-wrap" style="background:#eff6ff;"><span
+                                style="font-size:1.3rem;">🎯</span></div>
+                        <h5>Scalable compression from a single pipeline</h5>
+                        <p>All L operating points are derived from one pretrained model after a single joint fine-tuning
+                            stage — no separate training per budget required.</p>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <div class="contrib-card">
+                        <div class="contrib-icon-wrap" style="background:#fefce8;"><span
+                                style="font-size:1.3rem;">📐</span></div>
+                        <h5>Gradient-induced hierarchical organization</h5>
+                        <p>An iterative gradient-informed masking strategy aggregates gradient norms across all Gaussian
+                            parameters to construct a stable, well-structured LoD hierarchy.</p>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <div class="contrib-card">
+                        <div class="contrib-icon-wrap" style="background:#f0fdf4;"><span
+                                style="font-size:1.3rem;">🔧</span></div>
+                        <h5>Model-agnostic design</h5>
+                        <p>Works on vanilla 3DGS, Scaffold-GS, and Octree-GS without architectural modifications.</p>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <div class="contrib-card">
+                        <div class="contrib-icon-wrap" style="background:#fdf4ff;"><span
+                                style="font-size:1.3rem;">🚀</span></div>
+                        <h5>Practical deployment</h5>
+                        <p>Decoding speedups of up to <strong>1762×</strong> compared to prior methods via ZSTD
+                            progressive coding.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ═══════════ METHOD ═══════════ -->
+    <div class="container mb-4">
+        <div class="section-card">
+            <hr class="section-line">
+            <h2 class="section-title">Method</h2>
+            <p class="abstract-text" style="max-width:860px;">
+                GoDe operates entirely post-training in three stages:
+                (1) gradient-informed iterative masking organizes Gaussians into a progressive hierarchy;
+                (2) a single quantization-aware fine-tuning stage jointly optimizes all levels via random level
+                sampling;
+                (3) each level is independently compressed for scalable progressive decoding.
+            </p>
+            <div class="text-center mt-4">
+                <img src="static/images/pipeline.png"
+                    style="width:100%; max-width:900px; height:auto; display:inline-block; border-radius:9px; border:1px solid #e5e7eb;">
+                <p class="fig-caption text-center mt-2" style="max-width:860px; margin:0 auto;">
+                    <strong>Fig. 2:</strong> Overview of GoDe. (1) Reorganize Gaussians into a progressive hierarchy via
+                    iterative gradient-informed assignment, (2) single quantization-aware fine-tuning jointly optimizing
+                    all levels, (3) compress each level independently for scalable decoding.
+                </p>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ═══════════ RESULTS / RD CURVES ═══════════ -->
+    <div class="container mb-4">
+        <div class="section-card">
+            <hr class="section-line">
+            <h2 class="section-title">Results</h2>
+            <p class="abstract-text" style="max-width:860px;">
+                GoDe covers compression rates from a few MB up to ~120 MB while preserving competitive
+                reconstruction quality across all three standard benchmarks and all three 3DGS backbone families.
+                The full rate–distortion curve is produced by a <strong>single progressive representation</strong>.
+            </p>
+            <div class="mt-4">
+                <img src="static/images/plots.png"
+                    style="width:100%; height:auto; display:block; border-radius:8px; border:1px solid #e5e7eb;"
+                    alt="Rate-distortion and FPS curves">
+                <p class="fig-caption text-center mt-2" style="max-width:860px; margin:0 auto;">
+                    <strong>Fig. 3:</strong> (Top) Rate–distortion curves on Mip-NeRF360, Tanks&amp;Temples, and
+                    DeepBlending.
+                    (Bottom) PSNR / FPS trade-off. Lower LoDs offer 500+ FPS for real-time adaptive rendering.
+                </p>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ═══════════ LOD VISUALIZATION ═══════════ -->
+    <div class="container mb-4">
+        <div class="section-card">
+            <hr class="section-line">
+            <h2 class="section-title">Progressive Level-of-Detail Visualization</h2>
+            <p class="abstract-text text-center" style="max-width:860px;">
+                Use the slider to explore all 8 levels of detail for each scene.
+            </p>
+
+            <div class="lod-ds-header" style="--dc:#2563eb;"><span class="lod-ds-dot"></span>Mip-NeRF360</div>
+            <div class="lod-row">
+                <div class="lod-col">
+                    <div class="lod-viewer" data-scene="bicycle" style="--sc:#2563eb;">
+                        <h4 class="lod-scene-title">Bicycle</h4>
+                        <div class="lod-ctrl">
+                            <div class="lod-ctrl-top">
+                                <span class="lod-ctrl-label">Level of Detail</span>
+                                <span class="lod-pill">LoD <strong class="lod-num">0</strong></span>
+                            </div>
+                            <input class="lod-range" type="range" min="0" max="7" value="0" step="1">
+                            <div class="lod-ticks">
+                                <span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span>
+                            </div>
+                        </div>
+                        <div class="lod-frame">
+                            <div class="lod-slide  active"><img src="static/images/bicycle/L0.jpeg" alt="bicycle LoD 0"
+                                    loading="lazy"></div>
+                            <div class="lod-slide"><img src="static/images/bicycle/L1.jpeg" alt="bicycle LoD 1"
+                                    loading="lazy"></div>
+                            <div class="lod-slide"><img src="static/images/bicycle/L2.jpeg" alt="bicycle LoD 2"
+                                    loading="lazy"></div>
+                            <div class="lod-slide"><img src="static/images/bicycle/L3.jpeg" alt="bicycle LoD 3"
+                                    loading="lazy"></div>
+                            <div class="lod-slide"><img src="static/images/bicycle/L4.jpeg" alt="bicycle LoD 4"
+                                    loading="lazy"></div>
+                            <div class="lod-slide"><img src="static/images/bicycle/L5.jpeg" alt="bicycle LoD 5"
+                                    loading="lazy"></div>
+                            <div class="lod-slide"><img src="static/images/bicycle/L6.jpeg" alt="bicycle LoD 6"
+                                    loading="lazy"></div>
+                            <div class="lod-slide"><img src="static/images/bicycle/L7.jpeg" alt="bicycle LoD 7"
+                                    loading="lazy"></div>
+                        </div>
+                        <div class="lod-stats">
+                            <div class="lod-stat"><span class="lod-stat-v s-fps">—</span><span
+                                    class="lod-stat-k">FPS</span></div>
+                            <div class="lod-stat"><span class="lod-stat-v s-psnr">—</span><span
+                                    class="lod-stat-k">PSNR</span></div>
+                            <div class="lod-stat"><span class="lod-stat-v s-size">—</span><span
+                                    class="lod-stat-k">MB</span></div>
+                            <div class="lod-stat"><span class="lod-stat-v s-w">—</span><span
+                                    class="lod-stat-k">Gauss.</span></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="lod-col">
+                    <div class="lod-viewer" data-scene="bonsai" style="--sc:#2563eb;">
+                        <h4 class="lod-scene-title">Bonsai</h4>
+                        <div class="lod-ctrl">
+                            <div class="lod-ctrl-top">
+                                <span class="lod-ctrl-label">Level of Detail</span>
+                                <span class="lod-pill">LoD <strong class="lod-num">0</strong></span>
+                            </div>
+                            <input class="lod-range" type="range" min="0" max="7" value="0" step="1">
+                            <div class="lod-ticks">
+                                <span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span>
+                            </div>
+                        </div>
+                        <div class="lod-frame">
+                            <div class="lod-slide  active"><img src="static/images/bonsai/L0.jpeg" alt="bonsai LoD 0"
+                                    loading="lazy"></div>
+                            <div class="lod-slide"><img src="static/images/bonsai/L1.jpeg" alt="bonsai LoD 1"
+                                    loading="lazy"></div>
+                            <div class="lod-slide"><img src="static/images/bonsai/L2.jpeg" alt="bonsai LoD 2"
+                                    loading="lazy"></div>
+                            <div class="lod-slide"><img src="static/images/bonsai/L3.jpeg" alt="bonsai LoD 3"
+                                    loading="lazy"></div>
+                            <div class="lod-slide"><img src="static/images/bonsai/L4.jpeg" alt="bonsai LoD 4"
+                                    loading="lazy"></div>
+                            <div class="lod-slide"><img src="static/images/bonsai/L5.jpeg" alt="bonsai LoD 5"
+                                    loading="lazy"></div>
+                            <div class="lod-slide"><img src="static/images/bonsai/L6.jpeg" alt="bonsai LoD 6"
+                                    loading="lazy"></div>
+                            <div class="lod-slide"><img src="static/images/bonsai/L7.jpeg" alt="bonsai LoD 7"
+                                    loading="lazy"></div>
+                        </div>
+                        <div class="lod-stats">
+                            <div class="lod-stat"><span class="lod-stat-v s-fps">—</span><span
+                                    class="lod-stat-k">FPS</span></div>
+                            <div class="lod-stat"><span class="lod-stat-v s-psnr">—</span><span
+                                    class="lod-stat-k">PSNR</span></div>
+                            <div class="lod-stat"><span class="lod-stat-v s-size">—</span><span
+                                    class="lod-stat-k">MB</span></div>
+                            <div class="lod-stat"><span class="lod-stat-v s-w">—</span><span
+                                    class="lod-stat-k">Gauss.</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="lod-row">
+                <div class="lod-col">
+                    <div class="lod-viewer" data-scene="counter" style="--sc:#2563eb;">
+                        <h4 class="lod-scene-title">Counter</h4>
+                        <div class="lod-ctrl">
+                            <div class="lod-ctrl-top">
+                                <span class="lod-ctrl-label">Level of Detail</span>
+                                <span class="lod-pill">LoD <strong class="lod-num">0</strong></span>
+                            </div>
+                            <input class="lod-range" type="range" min="0" max="7" value="0" step="1">
+                            <div class="lod-ticks">
+                                <span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span>
+                            </div>
+                        </div>
+                        <div class="lod-frame">
+                            <div class="lod-slide  active"><img src="static/images/counter/L0.jpeg" alt="counter LoD 0"
+                                    loading="lazy"></div>
+                            <div class="lod-slide"><img src="static/images/counter/L1.jpeg" alt="counter LoD 1"
+                                    loading="lazy"></div>
+                            <div class="lod-slide"><img src="static/images/counter/L2.jpeg" alt="counter LoD 2"
+                                    loading="lazy"></div>
+                            <div class="lod-slide"><img src="static/images/counter/L3.jpeg" alt="counter LoD 3"
+                                    loading="lazy"></div>
+                            <div class="lod-slide"><img src="static/images/counter/L4.jpeg" alt="counter LoD 4"
+                                    loading="lazy"></div>
+                            <div class="lod-slide"><img src="static/images/counter/L5.jpeg" alt="counter LoD 5"
+                                    loading="lazy"></div>
+                            <div class="lod-slide"><img src="static/images/counter/L6.jpeg" alt="counter LoD 6"
+                                    loading="lazy"></div>
+                            <div class="lod-slide"><img src="static/images/counter/L7.jpeg" alt="counter LoD 7"
+                                    loading="lazy"></div>
+                        </div>
+                        <div class="lod-stats">
+                            <div class="lod-stat"><span class="lod-stat-v s-fps">—</span><span
+                                    class="lod-stat-k">FPS</span></div>
+                            <div class="lod-stat"><span class="lod-stat-v s-psnr">—</span><span
+                                    class="lod-stat-k">PSNR</span></div>
+                            <div class="lod-stat"><span class="lod-stat-v s-size">—</span><span
+                                    class="lod-stat-k">MB</span></div>
+                            <div class="lod-stat"><span class="lod-stat-v s-w">—</span><span
+                                    class="lod-stat-k">Gauss.</span></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="lod-col">
+                    <div class="lod-viewer" data-scene="flowers" style="--sc:#2563eb;">
+                        <h4 class="lod-scene-title">Flowers</h4>
+                        <div class="lod-ctrl">
+                            <div class="lod-ctrl-top">
+                                <span class="lod-ctrl-label">Level of Detail</span>
+                                <span class="lod-pill">LoD <strong class="lod-num">0</strong></span>
+                            </div>
+                            <input class="lod-range" type="range" min="0" max="7" value="0" step="1">
+                            <div class="lod-ticks">
+                                <span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span>
+                            </div>
+                        </div>
+                        <div class="lod-frame">
+                            <div class="lod-slide  active"><img src="static/images/flowers/L0.jpeg" alt="flowers LoD 0"
+                                    loading="lazy"></div>
+                            <div class="lod-slide"><img src="static/images/flowers/L1.jpeg" alt="flowers LoD 1"
+                                    loading="lazy"></div>
+                            <div class="lod-slide"><img src="static/images/flowers/L2.jpeg" alt="flowers LoD 2"
+                                    loading="lazy"></div>
+                            <div class="lod-slide"><img src="static/images/flowers/L3.jpeg" alt="flowers LoD 3"
+                                    loading="lazy"></div>
+                            <div class="lod-slide"><img src="static/images/flowers/L4.jpeg" alt="flowers LoD 4"
+                                    loading="lazy"></div>
+                            <div class="lod-slide"><img src="static/images/flowers/L5.jpeg" alt="flowers LoD 5"
+                                    loading="lazy"></div>
+                            <div class="lod-slide"><img src="static/images/flowers/L6.jpeg" alt="flowers LoD 6"
+                                    loading="lazy"></div>
+                            <div class="lod-slide"><img src="static/images/flowers/L7.jpeg" alt="flowers LoD 7"
+                                    loading="lazy"></div>
+                        </div>
+                        <div class="lod-stats">
+                            <div class="lod-stat"><span class="lod-stat-v s-fps">—</span><span
+                                    class="lod-stat-k">FPS</span></div>
+                            <div class="lod-stat"><span class="lod-stat-v s-psnr">—</span><span
+                                    class="lod-stat-k">PSNR</span></div>
+                            <div class="lod-stat"><span class="lod-stat-v s-size">—</span><span
+                                    class="lod-stat-k">MB</span></div>
+                            <div class="lod-stat"><span class="lod-stat-v s-w">—</span><span
+                                    class="lod-stat-k">Gauss.</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="lod-row">
+                <div class="lod-col">
+                    <div class="lod-viewer" data-scene="garden" style="--sc:#2563eb;">
+                        <h4 class="lod-scene-title">Garden</h4>
+                        <div class="lod-ctrl">
+                            <div class="lod-ctrl-top">
+                                <span class="lod-ctrl-label">Level of Detail</span>
+                                <span class="lod-pill">LoD <strong class="lod-num">0</strong></span>
+                            </div>
+                            <input class="lod-range" type="range" min="0" max="7" value="0" step="1">
+                            <div class="lod-ticks">
+                                <span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span>
+                            </div>
+                        </div>
+                        <div class="lod-frame">
+                            <div class="lod-slide  active"><img src="static/images/garden/L0.jpeg" alt="garden LoD 0"
+                                    loading="lazy"></div>
+                            <div class="lod-slide"><img src="static/images/garden/L1.jpeg" alt="garden LoD 1"
+                                    loading="lazy"></div>
+                            <div class="lod-slide"><img src="static/images/garden/L2.jpeg" alt="garden LoD 2"
+                                    loading="lazy"></div>
+                            <div class="lod-slide"><img src="static/images/garden/L3.jpeg" alt="garden LoD 3"
+                                    loading="lazy"></div>
+                            <div class="lod-slide"><img src="static/images/garden/L4.jpeg" alt="garden LoD 4"
+                                    loading="lazy"></div>
+                            <div class="lod-slide"><img src="static/images/garden/L5.jpeg" alt="garden LoD 5"
+                                    loading="lazy"></div>
+                            <div class="lod-slide"><img src="static/images/garden/L6.jpeg" alt="garden LoD 6"
+                                    loading="lazy"></div>
+                            <div class="lod-slide"><img src="static/images/garden/L7.jpeg" alt="garden LoD 7"
+                                    loading="lazy"></div>
+                        </div>
+                        <div class="lod-stats">
+                            <div class="lod-stat"><span class="lod-stat-v s-fps">—</span><span
+                                    class="lod-stat-k">FPS</span></div>
+                            <div class="lod-stat"><span class="lod-stat-v s-psnr">—</span><span
+                                    class="lod-stat-k">PSNR</span></div>
+                            <div class="lod-stat"><span class="lod-stat-v s-size">—</span><span
+                                    class="lod-stat-k">MB</span></div>
+                            <div class="lod-stat"><span class="lod-stat-v s-w">—</span><span
+                                    class="lod-stat-k">Gauss.</span></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="lod-col">
+                    <div class="lod-viewer" data-scene="kitchen" style="--sc:#2563eb;">
+                        <h4 class="lod-scene-title">Kitchen</h4>
+                        <div class="lod-ctrl">
+                            <div class="lod-ctrl-top">
+                                <span class="lod-ctrl-label">Level of Detail</span>
+                                <span class="lod-pill">LoD <strong class="lod-num">0</strong></span>
+                            </div>
+                            <input class="lod-range" type="range" min="0" max="7" value="0" step="1">
+                            <div class="lod-ticks">
+                                <span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span>
+                            </div>
+                        </div>
+                        <div class="lod-frame">
+                            <div class="lod-slide  active"><img src="static/images/kitchen/L0.jpeg" alt="kitchen LoD 0"
+                                    loading="lazy"></div>
+                            <div class="lod-slide"><img src="static/images/kitchen/L1.jpeg" alt="kitchen LoD 1"
+                                    loading="lazy"></div>
+                            <div class="lod-slide"><img src="static/images/kitchen/L2.jpeg" alt="kitchen LoD 2"
+                                    loading="lazy"></div>
+                            <div class="lod-slide"><img src="static/images/kitchen/L3.jpeg" alt="kitchen LoD 3"
+                                    loading="lazy"></div>
+                            <div class="lod-slide"><img src="static/images/kitchen/L4.jpeg" alt="kitchen LoD 4"
+                                    loading="lazy"></div>
+                            <div class="lod-slide"><img src="static/images/kitchen/L5.jpeg" alt="kitchen LoD 5"
+                                    loading="lazy"></div>
+                            <div class="lod-slide"><img src="static/images/kitchen/L6.jpeg" alt="kitchen LoD 6"
+                                    loading="lazy"></div>
+                            <div class="lod-slide"><img src="static/images/kitchen/L7.jpeg" alt="kitchen LoD 7"
+                                    loading="lazy"></div>
+                        </div>
+                        <div class="lod-stats">
+                            <div class="lod-stat"><span class="lod-stat-v s-fps">—</span><span
+                                    class="lod-stat-k">FPS</span></div>
+                            <div class="lod-stat"><span class="lod-stat-v s-psnr">—</span><span
+                                    class="lod-stat-k">PSNR</span></div>
+                            <div class="lod-stat"><span class="lod-stat-v s-size">—</span><span
+                                    class="lod-stat-k">MB</span></div>
+                            <div class="lod-stat"><span class="lod-stat-v s-w">—</span><span
+                                    class="lod-stat-k">Gauss.</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="lod-row">
+                <div class="lod-col">
+                    <div class="lod-viewer" data-scene="room" style="--sc:#2563eb;">
+                        <h4 class="lod-scene-title">Room</h4>
+                        <div class="lod-ctrl">
+                            <div class="lod-ctrl-top">
+                                <span class="lod-ctrl-label">Level of Detail</span>
+                                <span class="lod-pill">LoD <strong class="lod-num">0</strong></span>
+                            </div>
+                            <input class="lod-range" type="range" min="0" max="7" value="0" step="1">
+                            <div class="lod-ticks">
+                                <span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span>
+                            </div>
+                        </div>
+                        <div class="lod-frame">
+                            <div class="lod-slide  active"><img src="static/images/room/L0.jpeg" alt="room LoD 0"
+                                    loading="lazy"></div>
+                            <div class="lod-slide"><img src="static/images/room/L1.jpeg" alt="room LoD 1"
+                                    loading="lazy"></div>
+                            <div class="lod-slide"><img src="static/images/room/L2.jpeg" alt="room LoD 2"
+                                    loading="lazy"></div>
+                            <div class="lod-slide"><img src="static/images/room/L3.jpeg" alt="room LoD 3"
+                                    loading="lazy"></div>
+                            <div class="lod-slide"><img src="static/images/room/L4.jpeg" alt="room LoD 4"
+                                    loading="lazy"></div>
+                            <div class="lod-slide"><img src="static/images/room/L5.jpeg" alt="room LoD 5"
+                                    loading="lazy"></div>
+                            <div class="lod-slide"><img src="static/images/room/L6.jpeg" alt="room LoD 6"
+                                    loading="lazy"></div>
+                            <div class="lod-slide"><img src="static/images/room/L7.jpeg" alt="room LoD 7"
+                                    loading="lazy"></div>
+                        </div>
+                        <div class="lod-stats">
+                            <div class="lod-stat"><span class="lod-stat-v s-fps">—</span><span
+                                    class="lod-stat-k">FPS</span></div>
+                            <div class="lod-stat"><span class="lod-stat-v s-psnr">—</span><span
+                                    class="lod-stat-k">PSNR</span></div>
+                            <div class="lod-stat"><span class="lod-stat-v s-size">—</span><span
+                                    class="lod-stat-k">MB</span></div>
+                            <div class="lod-stat"><span class="lod-stat-v s-w">—</span><span
+                                    class="lod-stat-k">Gauss.</span></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="lod-col">
+                    <div class="lod-viewer" data-scene="stump" style="--sc:#2563eb;">
+                        <h4 class="lod-scene-title">Stump</h4>
+                        <div class="lod-ctrl">
+                            <div class="lod-ctrl-top">
+                                <span class="lod-ctrl-label">Level of Detail</span>
+                                <span class="lod-pill">LoD <strong class="lod-num">0</strong></span>
+                            </div>
+                            <input class="lod-range" type="range" min="0" max="7" value="0" step="1">
+                            <div class="lod-ticks">
+                                <span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span>
+                            </div>
+                        </div>
+                        <div class="lod-frame">
+                            <div class="lod-slide  active"><img src="static/images/stump/L0.jpeg" alt="stump LoD 0"
+                                    loading="lazy"></div>
+                            <div class="lod-slide"><img src="static/images/stump/L1.jpeg" alt="stump LoD 1"
+                                    loading="lazy"></div>
+                            <div class="lod-slide"><img src="static/images/stump/L2.jpeg" alt="stump LoD 2"
+                                    loading="lazy"></div>
+                            <div class="lod-slide"><img src="static/images/stump/L3.jpeg" alt="stump LoD 3"
+                                    loading="lazy"></div>
+                            <div class="lod-slide"><img src="static/images/stump/L4.jpeg" alt="stump LoD 4"
+                                    loading="lazy"></div>
+                            <div class="lod-slide"><img src="static/images/stump/L5.jpeg" alt="stump LoD 5"
+                                    loading="lazy"></div>
+                            <div class="lod-slide"><img src="static/images/stump/L6.jpeg" alt="stump LoD 6"
+                                    loading="lazy"></div>
+                            <div class="lod-slide"><img src="static/images/stump/L7.jpeg" alt="stump LoD 7"
+                                    loading="lazy"></div>
+                        </div>
+                        <div class="lod-stats">
+                            <div class="lod-stat"><span class="lod-stat-v s-fps">—</span><span
+                                    class="lod-stat-k">FPS</span></div>
+                            <div class="lod-stat"><span class="lod-stat-v s-psnr">—</span><span
+                                    class="lod-stat-k">PSNR</span></div>
+                            <div class="lod-stat"><span class="lod-stat-v s-size">—</span><span
+                                    class="lod-stat-k">MB</span></div>
+                            <div class="lod-stat"><span class="lod-stat-v s-w">—</span><span
+                                    class="lod-stat-k">Gauss.</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="lod-row">
+                <div class="lod-col">
+                    <div class="lod-viewer" data-scene="treehill" style="--sc:#2563eb;">
+                        <h4 class="lod-scene-title">Treehill</h4>
+                        <div class="lod-ctrl">
+                            <div class="lod-ctrl-top">
+                                <span class="lod-ctrl-label">Level of Detail</span>
+                                <span class="lod-pill">LoD <strong class="lod-num">0</strong></span>
+                            </div>
+                            <input class="lod-range" type="range" min="0" max="7" value="0" step="1">
+                            <div class="lod-ticks">
+                                <span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span>
+                            </div>
+                        </div>
+                        <div class="lod-frame">
+                            <div class="lod-slide  active"><img src="static/images/treehill/L0.jpeg"
+                                    alt="treehill LoD 0" loading="lazy"></div>
+                            <div class="lod-slide"><img src="static/images/treehill/L1.jpeg" alt="treehill LoD 1"
+                                    loading="lazy"></div>
+                            <div class="lod-slide"><img src="static/images/treehill/L2.jpeg" alt="treehill LoD 2"
+                                    loading="lazy"></div>
+                            <div class="lod-slide"><img src="static/images/treehill/L3.jpeg" alt="treehill LoD 3"
+                                    loading="lazy"></div>
+                            <div class="lod-slide"><img src="static/images/treehill/L4.jpeg" alt="treehill LoD 4"
+                                    loading="lazy"></div>
+                            <div class="lod-slide"><img src="static/images/treehill/L5.jpeg" alt="treehill LoD 5"
+                                    loading="lazy"></div>
+                            <div class="lod-slide"><img src="static/images/treehill/L6.jpeg" alt="treehill LoD 6"
+                                    loading="lazy"></div>
+                            <div class="lod-slide"><img src="static/images/treehill/L7.jpeg" alt="treehill LoD 7"
+                                    loading="lazy"></div>
+                        </div>
+                        <div class="lod-stats">
+                            <div class="lod-stat"><span class="lod-stat-v s-fps">—</span><span
+                                    class="lod-stat-k">FPS</span></div>
+                            <div class="lod-stat"><span class="lod-stat-v s-psnr">—</span><span
+                                    class="lod-stat-k">PSNR</span></div>
+                            <div class="lod-stat"><span class="lod-stat-v s-size">—</span><span
+                                    class="lod-stat-k">MB</span></div>
+                            <div class="lod-stat"><span class="lod-stat-v s-w">—</span><span
+                                    class="lod-stat-k">Gauss.</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="lod-ds-header" style="--dc:#16a34a;"><span class="lod-ds-dot"></span>Tanks &amp; Temples</div>
+            <div class="lod-row">
+                <div class="lod-col">
+                    <div class="lod-viewer" data-scene="truck" style="--sc:#16a34a;">
+                        <h4 class="lod-scene-title">Truck</h4>
+                        <div class="lod-ctrl">
+                            <div class="lod-ctrl-top">
+                                <span class="lod-ctrl-label">Level of Detail</span>
+                                <span class="lod-pill">LoD <strong class="lod-num">0</strong></span>
+                            </div>
+                            <input class="lod-range" type="range" min="0" max="7" value="0" step="1">
+                            <div class="lod-ticks">
+                                <span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span>
+                            </div>
+                        </div>
+                        <div class="lod-frame">
+                            <div class="lod-slide  active"><img src="static/images/truck/L0.jpeg" alt="truck LoD 0"
+                                    loading="lazy"></div>
+                            <div class="lod-slide"><img src="static/images/truck/L1.jpeg" alt="truck LoD 1"
+                                    loading="lazy"></div>
+                            <div class="lod-slide"><img src="static/images/truck/L2.jpeg" alt="truck LoD 2"
+                                    loading="lazy"></div>
+                            <div class="lod-slide"><img src="static/images/truck/L3.jpeg" alt="truck LoD 3"
+                                    loading="lazy"></div>
+                            <div class="lod-slide"><img src="static/images/truck/L4.jpeg" alt="truck LoD 4"
+                                    loading="lazy"></div>
+                            <div class="lod-slide"><img src="static/images/truck/L5.jpeg" alt="truck LoD 5"
+                                    loading="lazy"></div>
+                            <div class="lod-slide"><img src="static/images/truck/L6.jpeg" alt="truck LoD 6"
+                                    loading="lazy"></div>
+                            <div class="lod-slide"><img src="static/images/truck/L7.jpeg" alt="truck LoD 7"
+                                    loading="lazy"></div>
+                        </div>
+                        <div class="lod-stats">
+                            <div class="lod-stat"><span class="lod-stat-v s-fps">—</span><span
+                                    class="lod-stat-k">FPS</span></div>
+                            <div class="lod-stat"><span class="lod-stat-v s-psnr">—</span><span
+                                    class="lod-stat-k">PSNR</span></div>
+                            <div class="lod-stat"><span class="lod-stat-v s-size">—</span><span
+                                    class="lod-stat-k">MB</span></div>
+                            <div class="lod-stat"><span class="lod-stat-v s-w">—</span><span
+                                    class="lod-stat-k">Gauss.</span></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="lod-col">
+                    <div class="lod-viewer" data-scene="train" style="--sc:#16a34a;">
+                        <h4 class="lod-scene-title">Train</h4>
+                        <div class="lod-ctrl">
+                            <div class="lod-ctrl-top">
+                                <span class="lod-ctrl-label">Level of Detail</span>
+                                <span class="lod-pill">LoD <strong class="lod-num">0</strong></span>
+                            </div>
+                            <input class="lod-range" type="range" min="0" max="7" value="0" step="1">
+                            <div class="lod-ticks">
+                                <span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span>
+                            </div>
+                        </div>
+                        <div class="lod-frame">
+                            <div class="lod-slide  active"><img src="static/images/train/L0.jpeg" alt="train LoD 0"
+                                    loading="lazy"></div>
+                            <div class="lod-slide"><img src="static/images/train/L1.jpeg" alt="train LoD 1"
+                                    loading="lazy"></div>
+                            <div class="lod-slide"><img src="static/images/train/L2.jpeg" alt="train LoD 2"
+                                    loading="lazy"></div>
+                            <div class="lod-slide"><img src="static/images/train/L3.jpeg" alt="train LoD 3"
+                                    loading="lazy"></div>
+                            <div class="lod-slide"><img src="static/images/train/L4.jpeg" alt="train LoD 4"
+                                    loading="lazy"></div>
+                            <div class="lod-slide"><img src="static/images/train/L5.jpeg" alt="train LoD 5"
+                                    loading="lazy"></div>
+                            <div class="lod-slide"><img src="static/images/train/L6.jpeg" alt="train LoD 6"
+                                    loading="lazy"></div>
+                            <div class="lod-slide"><img src="static/images/train/L7.jpeg" alt="train LoD 7"
+                                    loading="lazy"></div>
+                        </div>
+                        <div class="lod-stats">
+                            <div class="lod-stat"><span class="lod-stat-v s-fps">—</span><span
+                                    class="lod-stat-k">FPS</span></div>
+                            <div class="lod-stat"><span class="lod-stat-v s-psnr">—</span><span
+                                    class="lod-stat-k">PSNR</span></div>
+                            <div class="lod-stat"><span class="lod-stat-v s-size">—</span><span
+                                    class="lod-stat-k">MB</span></div>
+                            <div class="lod-stat"><span class="lod-stat-v s-w">—</span><span
+                                    class="lod-stat-k">Gauss.</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="lod-ds-header" style="--dc:#9333ea;"><span class="lod-ds-dot"></span>Deep Blending</div>
+            <div class="lod-row">
+                <div class="lod-col">
+                    <div class="lod-viewer" data-scene="drjohnson" style="--sc:#9333ea;">
+                        <h4 class="lod-scene-title">Dr. Johnson</h4>
+                        <div class="lod-ctrl">
+                            <div class="lod-ctrl-top">
+                                <span class="lod-ctrl-label">Level of Detail</span>
+                                <span class="lod-pill">LoD <strong class="lod-num">0</strong></span>
+                            </div>
+                            <input class="lod-range" type="range" min="0" max="7" value="0" step="1">
+                            <div class="lod-ticks">
+                                <span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span>
+                            </div>
+                        </div>
+                        <div class="lod-frame">
+                            <div class="lod-slide  active"><img src="static/images/drjohnson/L0.jpeg"
+                                    alt="drjohnson LoD 0" loading="lazy"></div>
+                            <div class="lod-slide"><img src="static/images/drjohnson/L1.jpeg" alt="drjohnson LoD 1"
+                                    loading="lazy"></div>
+                            <div class="lod-slide"><img src="static/images/drjohnson/L2.jpeg" alt="drjohnson LoD 2"
+                                    loading="lazy"></div>
+                            <div class="lod-slide"><img src="static/images/drjohnson/L3.jpeg" alt="drjohnson LoD 3"
+                                    loading="lazy"></div>
+                            <div class="lod-slide"><img src="static/images/drjohnson/L4.jpeg" alt="drjohnson LoD 4"
+                                    loading="lazy"></div>
+                            <div class="lod-slide"><img src="static/images/drjohnson/L5.jpeg" alt="drjohnson LoD 5"
+                                    loading="lazy"></div>
+                            <div class="lod-slide"><img src="static/images/drjohnson/L6.jpeg" alt="drjohnson LoD 6"
+                                    loading="lazy"></div>
+                            <div class="lod-slide"><img src="static/images/drjohnson/L7.jpeg" alt="drjohnson LoD 7"
+                                    loading="lazy"></div>
+                        </div>
+                        <div class="lod-stats">
+                            <div class="lod-stat"><span class="lod-stat-v s-fps">—</span><span
+                                    class="lod-stat-k">FPS</span></div>
+                            <div class="lod-stat"><span class="lod-stat-v s-psnr">—</span><span
+                                    class="lod-stat-k">PSNR</span></div>
+                            <div class="lod-stat"><span class="lod-stat-v s-size">—</span><span
+                                    class="lod-stat-k">MB</span></div>
+                            <div class="lod-stat"><span class="lod-stat-v s-w">—</span><span
+                                    class="lod-stat-k">Gauss.</span></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="lod-col">
+                    <div class="lod-viewer" data-scene="playroom" style="--sc:#9333ea;">
+                        <h4 class="lod-scene-title">Playroom</h4>
+                        <div class="lod-ctrl">
+                            <div class="lod-ctrl-top">
+                                <span class="lod-ctrl-label">Level of Detail</span>
+                                <span class="lod-pill">LoD <strong class="lod-num">0</strong></span>
+                            </div>
+                            <input class="lod-range" type="range" min="0" max="7" value="0" step="1">
+                            <div class="lod-ticks">
+                                <span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span>
+                            </div>
+                        </div>
+                        <div class="lod-frame">
+                            <div class="lod-slide  active"><img src="static/images/playroom/L0.jpeg"
+                                    alt="playroom LoD 0" loading="lazy"></div>
+                            <div class="lod-slide"><img src="static/images/playroom/L1.jpeg" alt="playroom LoD 1"
+                                    loading="lazy"></div>
+                            <div class="lod-slide"><img src="static/images/playroom/L2.jpeg" alt="playroom LoD 2"
+                                    loading="lazy"></div>
+                            <div class="lod-slide"><img src="static/images/playroom/L3.jpeg" alt="playroom LoD 3"
+                                    loading="lazy"></div>
+                            <div class="lod-slide"><img src="static/images/playroom/L4.jpeg" alt="playroom LoD 4"
+                                    loading="lazy"></div>
+                            <div class="lod-slide"><img src="static/images/playroom/L5.jpeg" alt="playroom LoD 5"
+                                    loading="lazy"></div>
+                            <div class="lod-slide"><img src="static/images/playroom/L6.jpeg" alt="playroom LoD 6"
+                                    loading="lazy"></div>
+                            <div class="lod-slide"><img src="static/images/playroom/L7.jpeg" alt="playroom LoD 7"
+                                    loading="lazy"></div>
+                        </div>
+                        <div class="lod-stats">
+                            <div class="lod-stat"><span class="lod-stat-v s-fps">—</span><span
+                                    class="lod-stat-k">FPS</span></div>
+                            <div class="lod-stat"><span class="lod-stat-v s-psnr">—</span><span
+                                    class="lod-stat-k">PSNR</span></div>
+                            <div class="lod-stat"><span class="lod-stat-v s-size">—</span><span
+                                    class="lod-stat-k">MB</span></div>
+                            <div class="lod-stat"><span class="lod-stat-v s-w">—</span><span
+                                    class="lod-stat-k">Gauss.</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ═══════════ SMOOTH TRANSITIONS ═══════════ -->
+    <div class="container mb-4">
+        <div class="section-card">
+            <hr class="section-line">
+            <h2 class="section-title">Smooth Level Transitions</h2>
+            <p class="abstract-text" style="max-width:860px;">
+                Switching between adjacent levels can cause abrupt pop-in artifacts.
+                GoDe mitigates this via <strong>runtime opacity interpolation</strong>:
+                enhancement Gaussians in E<sub>l</sub> fade in linearly from opacity 0 to their target value.
+                Applied at render time only — no training overhead.
+            </p>
+            <div class="row mt-4">
+                <div class="col-md-6 mb-3">
+                    <div class="video-wrap"><video controls muted loop playsinline>
+                            <source src="static/videos/garden.mp4" type="video/mp4">
+                        </video></div>
+                    <p class="fig-caption text-center mt-1"><em>Garden</em></p>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <div class="video-wrap"><video controls muted loop playsinline>
+                            <source src="static/videos/kitchen.mp4" type="video/mp4">
+                        </video></div>
+                    <p class="fig-caption text-center mt-1"><em>Kitchen</em></p>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <div class="video-wrap"><video controls muted loop playsinline>
+                            <source src="static/videos/truck.mp4" type="video/mp4">
+                        </video></div>
+                    <p class="fig-caption text-center mt-1"><em>Truck</em></p>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <div class="video-wrap"><video controls muted loop playsinline>
+                            <source src="static/videos/counter.mp4" type="video/mp4">
+                        </video></div>
+                    <p class="fig-caption text-center mt-1"><em>Counter</em></p>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <div class="video-wrap"><video controls muted loop playsinline>
+                            <source src="static/videos/bicycle.mp4" type="video/mp4">
+                        </video></div>
+                    <p class="fig-caption text-center mt-1"><em>Bicycle</em></p>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <div class="video-wrap"><video controls muted loop playsinline>
+                            <source src="static/videos/bonsai.mp4" type="video/mp4">
+                        </video></div>
+                    <p class="fig-caption text-center mt-1"><em>Bonsai</em></p>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <div class="video-wrap"><video controls muted loop playsinline>
+                            <source src="static/videos/train.mp4" type="video/mp4">
+                        </video></div>
+                    <p class="fig-caption text-center mt-1"><em>Train</em></p>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <div class="video-wrap"><video controls muted loop playsinline>
+                            <source src="static/videos/playroom.mp4" type="video/mp4">
+                        </video></div>
+                    <p class="fig-caption text-center mt-1"><em>Playroom</em></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ═══════════ QUANTITATIVE COMPARISON ═══════════ -->
+    <div class="container mb-4">
+        <div class="section-card">
+            <hr class="section-line">
+            <h2 class="section-title">Quantitative Comparison</h2>
+            <p class="body-text" style="max-width:860px; margin-bottom:16px;">
+                Comparison against recent compression methods on three standard benchmarks, all retrained and
+                evaluated on a single NVIDIA A40. GoDe presents all 8 levels from a single trained model.
+                <span class="t-best-legend">Red</span> = best, <span class="t-second-legend">yellow</span> = second
+                best.
+                <span class="t-scalable t-yes" style="padding:1px 6px; border-radius:4px; font-size:0.76rem;">✓</span> =
+                scalable (single model, multiple rates).
+            </p>
+            <ul class="nav nav-tabs comp-tabs mb-0" role="tablist">
+                <li class="nav-item"><a class="nav-link active" data-toggle="tab" href="#tab-mip" role="tab"><span
+                            class="comp-tab-dot" style="background:#2563eb;"></span>Mip-NeRF360</a></li>
+                <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#tab-tnt" role="tab"><span
+                            class="comp-tab-dot" style="background:#16a34a;"></span>Tanks &amp; Temples</a></li>
+                <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#tab-db" role="tab"><span
+                            class="comp-tab-dot" style="background:#9333ea;"></span>Deep Blending</a></li>
+            </ul>
+            <div class="tab-content comp-tab-content">
+                <div class="tab-pane fade show active" id="tab-mip" role="tabpanel">
+                    <div class="table-responsive">
+                        <table class="comp-table">
+                            <thead>
+                                <tr>
+                                    <th rowspan="2" class="t-th-method">Method</th>
+                                    <th rowspan="2" class="t-th-level">Level</th>
+                                    <th rowspan="2" class="t-th-scalable">Scalable</th>
+                                    <th colspan="6" class="t-th-dataset">Mip-NeRF360</th>
+                                </tr>
+                                <tr>
+                                    <th>PSNR&nbsp;↑</th>
+                                    <th>SSIM&nbsp;↑</th>
+                                    <th>LPIPS&nbsp;↓</th>
+                                    <th>Size&nbsp;↓</th>
+                                    <th>W&nbsp;↓</th>
+                                    <th>FPS&nbsp;↑</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr style="background:#eff6ff;">
+                                    <td rowspan="8" class="t-method-name"><span class="t-ours-badge"
+                                            style="background:#2563eb;">Ours</span> 3DGS-MCMC</td>
+                                    <td class="t-level">LoD 0</td>
+                                    <td class="t-scalable t-yes">✓</td>
+                                    <td>25.38</td>
+                                    <td>0.716</td>
+                                    <td>0.407</td>
+                                    <td class="t-second">4.2</td>
+                                    <td>100</td>
+                                    <td class="t-best">421</td>
+                                </tr>
+                                <tr style="background:#eff6ff;">
+                                    <td class="t-level">LoD 1</td>
+                                    <td class="t-scalable t-yes">✓</td>
+                                    <td>26.19</td>
+                                    <td>0.748</td>
+                                    <td>0.371</td>
+                                    <td>6.1</td>
+                                    <td>155</td>
+                                    <td class="t-second">358</td>
+                                </tr>
+                                <tr style="background:#eff6ff;">
+                                    <td class="t-level">LoD 2</td>
+                                    <td class="t-scalable t-yes">✓</td>
+                                    <td>26.71</td>
+                                    <td>0.773</td>
+                                    <td>0.339</td>
+                                    <td>9.1</td>
+                                    <td>242</td>
+                                    <td>304</td>
+                                </tr>
+                                <tr style="background:#eff6ff;">
+                                    <td class="t-level">LoD 3</td>
+                                    <td class="t-scalable t-yes">✓</td>
+                                    <td>27.08</td>
+                                    <td>0.791</td>
+                                    <td>0.311</td>
+                                    <td>13.6</td>
+                                    <td>381</td>
+                                    <td>256</td>
+                                </tr>
+                                <tr style="background:#eff6ff;">
+                                    <td class="t-level">LoD 4</td>
+                                    <td class="t-scalable t-yes">✓</td>
+                                    <td>27.32</td>
+                                    <td>0.804</td>
+                                    <td>0.289</td>
+                                    <td>20.6</td>
+                                    <td>603</td>
+                                    <td>213</td>
+                                </tr>
+                                <tr style="background:#eff6ff;">
+                                    <td class="t-level">LoD 5</td>
+                                    <td class="t-scalable t-yes">✓</td>
+                                    <td>27.45</td>
+                                    <td>0.812</td>
+                                    <td>0.273</td>
+                                    <td>31.3</td>
+                                    <td>962</td>
+                                    <td>174</td>
+                                </tr>
+                                <tr style="background:#eff6ff;">
+                                    <td class="t-level">LoD 6</td>
+                                    <td class="t-scalable t-yes">✓</td>
+                                    <td>27.49</td>
+                                    <td>0.815</td>
+                                    <td>0.263</td>
+                                    <td>46.9</td>
+                                    <td>1546</td>
+                                    <td>139</td>
+                                </tr>
+                                <tr style="background:#eff6ff;">
+                                    <td class="t-level">LoD 7</td>
+                                    <td class="t-scalable t-yes">✓</td>
+                                    <td>27.49</td>
+                                    <td class="t-second">0.816</td>
+                                    <td>0.259</td>
+                                    <td>68.3</td>
+                                    <td>2497</td>
+                                    <td>117</td>
+                                </tr>
+                                <tr style="background:#f0fdf4;">
+                                    <td rowspan="8" class="t-method-name"><span class="t-ours-badge"
+                                            style="background:#16a34a;">Ours</span> Scaffold-GS</td>
+                                    <td class="t-level">LoD 0</td>
+                                    <td class="t-scalable t-yes">✓</td>
+                                    <td>24.97</td>
+                                    <td>0.710</td>
+                                    <td>0.409</td>
+                                    <td class="t-best">4.1</td>
+                                    <td class="t-best">50</td>
+                                    <td>144</td>
+                                </tr>
+                                <tr style="background:#f0fdf4;">
+                                    <td class="t-level">LoD 1</td>
+                                    <td class="t-scalable t-yes">✓</td>
+                                    <td>25.98</td>
+                                    <td>0.742</td>
+                                    <td>0.376</td>
+                                    <td>5.5</td>
+                                    <td class="t-second">68</td>
+                                    <td>133</td>
+                                </tr>
+                                <tr style="background:#f0fdf4;">
+                                    <td class="t-level">LoD 2</td>
+                                    <td class="t-scalable t-yes">✓</td>
+                                    <td>26.69</td>
+                                    <td>0.768</td>
+                                    <td>0.345</td>
+                                    <td>7.5</td>
+                                    <td>94</td>
+                                    <td>122</td>
+                                </tr>
+                                <tr style="background:#f0fdf4;">
+                                    <td class="t-level">LoD 3</td>
+                                    <td class="t-scalable t-yes">✓</td>
+                                    <td>27.25</td>
+                                    <td>0.789</td>
+                                    <td>0.318</td>
+                                    <td>10.2</td>
+                                    <td>129</td>
+                                    <td>108</td>
+                                </tr>
+                                <tr style="background:#f0fdf4;">
+                                    <td class="t-level">LoD 4</td>
+                                    <td class="t-scalable t-yes">✓</td>
+                                    <td>27.62</td>
+                                    <td>0.803</td>
+                                    <td>0.297</td>
+                                    <td>14.0</td>
+                                    <td>179</td>
+                                    <td>94</td>
+                                </tr>
+                                <tr style="background:#f0fdf4;">
+                                    <td class="t-level">LoD 5</td>
+                                    <td class="t-scalable t-yes">✓</td>
+                                    <td>27.79</td>
+                                    <td>0.810</td>
+                                    <td>0.284</td>
+                                    <td>19.3</td>
+                                    <td>248</td>
+                                    <td>83</td>
+                                </tr>
+                                <tr style="background:#f0fdf4;">
+                                    <td class="t-level">LoD 6</td>
+                                    <td class="t-scalable t-yes">✓</td>
+                                    <td class="t-second">27.85</td>
+                                    <td>0.812</td>
+                                    <td>0.278</td>
+                                    <td>26.6</td>
+                                    <td>346</td>
+                                    <td>74</td>
+                                </tr>
+                                <tr style="background:#f0fdf4;">
+                                    <td class="t-level">LoD 7</td>
+                                    <td class="t-scalable t-yes">✓</td>
+                                    <td class="t-best">27.87</td>
+                                    <td>0.813</td>
+                                    <td>0.276</td>
+                                    <td>36.9</td>
+                                    <td>483</td>
+                                    <td>69</td>
+                                </tr>
+                                <tr style="background:#fdf4ff;">
+                                    <td rowspan="8" class="t-method-name"><span class="t-ours-badge"
+                                            style="background:#9333ea;">Ours</span> Octree-GS</td>
+                                    <td class="t-level">LoD 0</td>
+                                    <td class="t-scalable t-yes">✓</td>
+                                    <td>23.77</td>
+                                    <td>0.664</td>
+                                    <td>0.447</td>
+                                    <td class="t-best">4.1</td>
+                                    <td class="t-best">50</td>
+                                    <td>149</td>
+                                </tr>
+                                <tr style="background:#fdf4ff;">
+                                    <td class="t-level">LoD 1</td>
+                                    <td class="t-scalable t-yes">✓</td>
+                                    <td>24.73</td>
+                                    <td>0.697</td>
+                                    <td>0.413</td>
+                                    <td>5.7</td>
+                                    <td>69</td>
+                                    <td>140</td>
+                                </tr>
+                                <tr style="background:#fdf4ff;">
+                                    <td class="t-level">LoD 2</td>
+                                    <td class="t-scalable t-yes">✓</td>
+                                    <td>25.61</td>
+                                    <td>0.729</td>
+                                    <td>0.378</td>
+                                    <td>7.8</td>
+                                    <td>96</td>
+                                    <td>127</td>
+                                </tr>
+                                <tr style="background:#fdf4ff;">
+                                    <td class="t-level">LoD 3</td>
+                                    <td class="t-scalable t-yes">✓</td>
+                                    <td>26.44</td>
+                                    <td>0.761</td>
+                                    <td>0.341</td>
+                                    <td>10.8</td>
+                                    <td>133</td>
+                                    <td>113</td>
+                                </tr>
+                                <tr style="background:#fdf4ff;">
+                                    <td class="t-level">LoD 4</td>
+                                    <td class="t-scalable t-yes">✓</td>
+                                    <td>27.11</td>
+                                    <td>0.789</td>
+                                    <td>0.305</td>
+                                    <td>14.8</td>
+                                    <td>186</td>
+                                    <td>100</td>
+                                </tr>
+                                <tr style="background:#fdf4ff;">
+                                    <td class="t-level">LoD 5</td>
+                                    <td class="t-scalable t-yes">✓</td>
+                                    <td>27.55</td>
+                                    <td>0.808</td>
+                                    <td>0.279</td>
+                                    <td>20.5</td>
+                                    <td>262</td>
+                                    <td>86</td>
+                                </tr>
+                                <tr style="background:#fdf4ff;">
+                                    <td class="t-level">LoD 6</td>
+                                    <td class="t-scalable t-yes">✓</td>
+                                    <td>27.75</td>
+                                    <td>0.815</td>
+                                    <td>0.265</td>
+                                    <td>28.2</td>
+                                    <td>371</td>
+                                    <td>78</td>
+                                </tr>
+                                <tr style="background:#fdf4ff;">
+                                    <td class="t-level">LoD 7</td>
+                                    <td class="t-scalable t-yes">✓</td>
+                                    <td>27.81</td>
+                                    <td class="t-best">0.817</td>
+                                    <td>0.261</td>
+                                    <td>38.5</td>
+                                    <td>527</td>
+                                    <td>73</td>
+                                </tr>
+                                <tr>
+                                    <td rowspan="3" class="t-method-name">Context-GS</td>
+                                    <td class="t-level">high</td>
+                                    <td class="t-scalable t-no">✗</td>
+                                    <td>27.57</td>
+                                    <td>0.808</td>
+                                    <td>0.289</td>
+                                    <td>12.4</td>
+                                    <td>364</td>
+                                    <td>66</td>
+                                </tr>
+                                <tr>
+                                    <td class="t-level">med</td>
+                                    <td class="t-scalable t-no">✗</td>
+                                    <td>27.74</td>
+                                    <td>0.812</td>
+                                    <td>0.279</td>
+                                    <td>18.3</td>
+                                    <td>429</td>
+                                    <td>58</td>
+                                </tr>
+                                <tr>
+                                    <td class="t-level">low</td>
+                                    <td class="t-scalable t-no">✗</td>
+                                    <td>27.74</td>
+                                    <td>0.812</td>
+                                    <td>0.279</td>
+                                    <td>21.6</td>
+                                    <td>477</td>
+                                    <td>55</td>
+                                </tr>
+                                <tr>
+                                    <td rowspan="3" class="t-method-name">HAC</td>
+                                    <td class="t-level">high</td>
+                                    <td class="t-scalable t-no">✗</td>
+                                    <td>27.17</td>
+                                    <td>0.798</td>
+                                    <td>0.306</td>
+                                    <td>11.5</td>
+                                    <td>371</td>
+                                    <td>74</td>
+                                </tr>
+                                <tr>
+                                    <td class="t-level">med</td>
+                                    <td class="t-scalable t-no">✗</td>
+                                    <td>27.53</td>
+                                    <td>0.807</td>
+                                    <td>0.290</td>
+                                    <td>15.2</td>
+                                    <td>425</td>
+                                    <td>72</td>
+                                </tr>
+                                <tr>
+                                    <td class="t-level">low</td>
+                                    <td class="t-scalable t-no">✗</td>
+                                    <td>27.78</td>
+                                    <td>0.812</td>
+                                    <td>0.277</td>
+                                    <td>22.0</td>
+                                    <td>501</td>
+                                    <td>68</td>
+                                </tr>
+                                <tr>
+                                    <td rowspan="3" class="t-method-name">RDO</td>
+                                    <td class="t-level">high</td>
+                                    <td class="t-scalable t-no">✗</td>
+                                    <td>26.45</td>
+                                    <td>0.782</td>
+                                    <td>0.322</td>
+                                    <td>9.7</td>
+                                    <td>862</td>
+                                    <td>280</td>
+                                </tr>
+                                <tr>
+                                    <td class="t-level">med</td>
+                                    <td class="t-scalable t-no">✗</td>
+                                    <td>26.89</td>
+                                    <td>0.796</td>
+                                    <td>0.298</td>
+                                    <td>15.3</td>
+                                    <td>1236</td>
+                                    <td>227</td>
+                                </tr>
+                                <tr>
+                                    <td class="t-level">low</td>
+                                    <td class="t-scalable t-no">✗</td>
+                                    <td>27.05</td>
+                                    <td>0.801</td>
+                                    <td>0.288</td>
+                                    <td>23.3</td>
+                                    <td>1860</td>
+                                    <td>178</td>
+                                </tr>
+                                <tr>
+                                    <td rowspan="3" class="t-method-name">Reduced-3DGS</td>
+                                    <td class="t-level">high</td>
+                                    <td class="t-scalable t-no">✗</td>
+                                    <td>27.05</td>
+                                    <td>0.807</td>
+                                    <td>0.272</td>
+                                    <td>22.7</td>
+                                    <td>1245</td>
+                                    <td>247</td>
+                                </tr>
+                                <tr>
+                                    <td class="t-level">med</td>
+                                    <td class="t-scalable t-no">✗</td>
+                                    <td>27.19</td>
+                                    <td>0.810</td>
+                                    <td>0.267</td>
+                                    <td>29.3</td>
+                                    <td>1436</td>
+                                    <td>234</td>
+                                </tr>
+                                <tr>
+                                    <td class="t-level">low</td>
+                                    <td class="t-scalable t-no">✗</td>
+                                    <td>27.28</td>
+                                    <td>0.813</td>
+                                    <td>0.264</td>
+                                    <td>45.8</td>
+                                    <td>1434</td>
+                                    <td>240</td>
+                                </tr>
+                                <tr>
+                                    <td rowspan="3" class="t-method-name">Comp-GS</td>
+                                    <td class="t-level">high</td>
+                                    <td class="t-scalable t-no">✗</td>
+                                    <td>26.40</td>
+                                    <td>0.778</td>
+                                    <td>0.323</td>
+                                    <td>9.1</td>
+                                    <td>454</td>
+                                    <td>233</td>
+                                </tr>
+                                <tr>
+                                    <td class="t-level">med</td>
+                                    <td class="t-scalable t-no">✗</td>
+                                    <td>26.71</td>
+                                    <td>0.790</td>
+                                    <td>0.305</td>
+                                    <td>10.9</td>
+                                    <td>470</td>
+                                    <td>193</td>
+                                </tr>
+                                <tr>
+                                    <td class="t-level">low</td>
+                                    <td class="t-scalable t-no">✗</td>
+                                    <td>27.28</td>
+                                    <td>0.802</td>
+                                    <td>0.283</td>
+                                    <td>16.4</td>
+                                    <td>485</td>
+                                    <td>165</td>
+                                </tr>
+                                <tr>
+                                    <td rowspan="2" class="t-method-name">SOG</td>
+                                    <td class="t-level">high</td>
+                                    <td class="t-scalable t-no">✗</td>
+                                    <td>26.56</td>
+                                    <td>0.791</td>
+                                    <td class="t-second">0.241</td>
+                                    <td>16.7</td>
+                                    <td>2150</td>
+                                    <td>119</td>
+                                </tr>
+                                <tr>
+                                    <td class="t-level">low</td>
+                                    <td class="t-scalable t-no">✗</td>
+                                    <td>27.08</td>
+                                    <td>0.799</td>
+                                    <td class="t-best">0.230</td>
+                                    <td>40.3</td>
+                                    <td>2176</td>
+                                    <td>132</td>
+                                </tr>
+                                <tr>
+                                    <td rowspan="1" class="t-method-name">EAGLES</td>
+                                    <td class="t-level">—</td>
+                                    <td class="t-scalable t-no">✗</td>
+                                    <td>27.13</td>
+                                    <td>0.809</td>
+                                    <td>0.278</td>
+                                    <td>57.1</td>
+                                    <td>1290</td>
+                                    <td>156</td>
+                                </tr>
+                                <tr>
+                                    <td rowspan="1" class="t-method-name">LightGS</td>
+                                    <td class="t-level">—</td>
+                                    <td class="t-scalable t-no">✗</td>
+                                    <td>27.24</td>
+                                    <td>0.810</td>
+                                    <td>0.273</td>
+                                    <td>51.0</td>
+                                    <td>2197</td>
+                                    <td>161</td>
+                                </tr>
+                                <tr>
+                                    <td rowspan="1" class="t-method-name">Compact-3DGS</td>
+                                    <td class="t-level">—</td>
+                                    <td class="t-scalable t-no">✗</td>
+                                    <td>27.02</td>
+                                    <td>0.800</td>
+                                    <td>0.287</td>
+                                    <td>29.1</td>
+                                    <td>1429</td>
+                                    <td>108</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="tab-pane fade " id="tab-tnt" role="tabpanel">
+                    <div class="table-responsive">
+                        <table class="comp-table">
+                            <thead>
+                                <tr>
+                                    <th rowspan="2" class="t-th-method">Method</th>
+                                    <th rowspan="2" class="t-th-level">Level</th>
+                                    <th rowspan="2" class="t-th-scalable">Scalable</th>
+                                    <th colspan="6" class="t-th-dataset">Tanks &amp; Temples</th>
+                                </tr>
+                                <tr>
+                                    <th>PSNR&nbsp;↑</th>
+                                    <th>SSIM&nbsp;↑</th>
+                                    <th>LPIPS&nbsp;↓</th>
+                                    <th>Size&nbsp;↓</th>
+                                    <th>W&nbsp;↓</th>
+                                    <th>FPS&nbsp;↑</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr style="background:#eff6ff;">
+                                    <td rowspan="8" class="t-method-name"><span class="t-ours-badge"
+                                            style="background:#2563eb;">Ours</span> 3DGS-MCMC</td>
+                                    <td class="t-level">LoD 0</td>
+                                    <td class="t-scalable t-yes">✓</td>
+                                    <td>21.93</td>
+                                    <td>0.768</td>
+                                    <td>0.334</td>
+                                    <td class="t-best">4.0</td>
+                                    <td>100</td>
+                                    <td class="t-best">540</td>
+                                </tr>
+                                <tr style="background:#eff6ff;">
+                                    <td class="t-level">LoD 1</td>
+                                    <td class="t-scalable t-yes">✓</td>
+                                    <td>22.70</td>
+                                    <td>0.792</td>
+                                    <td>0.304</td>
+                                    <td>5.3</td>
+                                    <td>144</td>
+                                    <td class="t-second">453</td>
+                                </tr>
+                                <tr style="background:#eff6ff;">
+                                    <td class="t-level">LoD 2</td>
+                                    <td class="t-scalable t-yes">✓</td>
+                                    <td>23.22</td>
+                                    <td>0.811</td>
+                                    <td>0.278</td>
+                                    <td>7.2</td>
+                                    <td>208</td>
+                                    <td>388</td>
+                                </tr>
+                                <tr style="background:#eff6ff;">
+                                    <td class="t-level">LoD 3</td>
+                                    <td class="t-scalable t-yes">✓</td>
+                                    <td>23.61</td>
+                                    <td>0.825</td>
+                                    <td>0.256</td>
+                                    <td>9.9</td>
+                                    <td>301</td>
+                                    <td>320</td>
+                                </tr>
+                                <tr style="background:#eff6ff;">
+                                    <td class="t-level">LoD 4</td>
+                                    <td class="t-scalable t-yes">✓</td>
+                                    <td>23.85</td>
+                                    <td>0.835</td>
+                                    <td>0.239</td>
+                                    <td>13.6</td>
+                                    <td>438</td>
+                                    <td>260</td>
+                                </tr>
+                                <tr style="background:#eff6ff;">
+                                    <td class="t-level">LoD 5</td>
+                                    <td class="t-scalable t-yes">✓</td>
+                                    <td>23.99</td>
+                                    <td>0.840</td>
+                                    <td>0.226</td>
+                                    <td>18.7</td>
+                                    <td>640</td>
+                                    <td>215</td>
+                                </tr>
+                                <tr style="background:#eff6ff;">
+                                    <td class="t-level">LoD 6</td>
+                                    <td class="t-scalable t-yes">✓</td>
+                                    <td>24.04</td>
+                                    <td>0.844</td>
+                                    <td>0.218</td>
+                                    <td>25.6</td>
+                                    <td>938</td>
+                                    <td>178</td>
+                                </tr>
+                                <tr style="background:#eff6ff;">
+                                    <td class="t-level">LoD 7</td>
+                                    <td class="t-scalable t-yes">✓</td>
+                                    <td>24.04</td>
+                                    <td>0.844</td>
+                                    <td>0.216</td>
+                                    <td>34.9</td>
+                                    <td>1379</td>
+                                    <td>157</td>
+                                </tr>
+                                <tr style="background:#f0fdf4;">
+                                    <td rowspan="8" class="t-method-name"><span class="t-ours-badge"
+                                            style="background:#16a34a;">Ours</span> Scaffold-GS</td>
+                                    <td class="t-level">LoD 0</td>
+                                    <td class="t-scalable t-yes">✓</td>
+                                    <td>23.13</td>
+                                    <td>0.806</td>
+                                    <td>0.295</td>
+                                    <td class="t-second">4.1</td>
+                                    <td class="t-best">50</td>
+                                    <td>167</td>
+                                </tr>
+                                <tr style="background:#f0fdf4;">
+                                    <td class="t-level">LoD 1</td>
+                                    <td class="t-scalable t-yes">✓</td>
+                                    <td>23.51</td>
+                                    <td>0.821</td>
+                                    <td>0.273</td>
+                                    <td>5.0</td>
+                                    <td class="t-second">61</td>
+                                    <td>155</td>
+                                </tr>
+                                <tr style="background:#f0fdf4;">
+                                    <td class="t-level">LoD 2</td>
+                                    <td class="t-scalable t-yes">✓</td>
+                                    <td>23.72</td>
+                                    <td>0.832</td>
+                                    <td>0.256</td>
+                                    <td>6.0</td>
+                                    <td>75</td>
+                                    <td>145</td>
+                                </tr>
+                                <tr style="background:#f0fdf4;">
+                                    <td class="t-level">LoD 3</td>
+                                    <td class="t-scalable t-yes">✓</td>
+                                    <td>23.86</td>
+                                    <td>0.839</td>
+                                    <td>0.242</td>
+                                    <td>7.4</td>
+                                    <td>93</td>
+                                    <td>138</td>
+                                </tr>
+                                <tr style="background:#f0fdf4;">
+                                    <td class="t-level">LoD 4</td>
+                                    <td class="t-scalable t-yes">✓</td>
+                                    <td>23.96</td>
+                                    <td>0.844</td>
+                                    <td>0.231</td>
+                                    <td>9.0</td>
+                                    <td>114</td>
+                                    <td>125</td>
+                                </tr>
+                                <tr style="background:#f0fdf4;">
+                                    <td class="t-level">LoD 5</td>
+                                    <td class="t-scalable t-yes">✓</td>
+                                    <td>24.01</td>
+                                    <td>0.848</td>
+                                    <td>0.224</td>
+                                    <td>11.0</td>
+                                    <td>141</td>
+                                    <td>116</td>
+                                </tr>
+                                <tr style="background:#f0fdf4;">
+                                    <td class="t-level">LoD 6</td>
+                                    <td class="t-scalable t-yes">✓</td>
+                                    <td>24.04</td>
+                                    <td>0.850</td>
+                                    <td>0.219</td>
+                                    <td>13.5</td>
+                                    <td>174</td>
+                                    <td>108</td>
+                                </tr>
+                                <tr style="background:#f0fdf4;">
+                                    <td class="t-level">LoD 7</td>
+                                    <td class="t-scalable t-yes">✓</td>
+                                    <td>24.04</td>
+                                    <td>0.851</td>
+                                    <td>0.218</td>
+                                    <td>16.5</td>
+                                    <td>215</td>
+                                    <td>98</td>
+                                </tr>
+                                <tr style="background:#fdf4ff;">
+                                    <td rowspan="8" class="t-method-name"><span class="t-ours-badge"
+                                            style="background:#9333ea;">Ours</span> Octree-GS</td>
+                                    <td class="t-level">LoD 0</td>
+                                    <td class="t-scalable t-yes">✓</td>
+                                    <td>22.42</td>
+                                    <td>0.776</td>
+                                    <td>0.369</td>
+                                    <td>4.2</td>
+                                    <td class="t-best">50</td>
+                                    <td>147</td>
+                                </tr>
+                                <tr style="background:#fdf4ff;">
+                                    <td class="t-level">LoD 1</td>
+                                    <td class="t-scalable t-yes">✓</td>
+                                    <td>23.14</td>
+                                    <td>0.799</td>
+                                    <td>0.339</td>
+                                    <td>5.7</td>
+                                    <td>68</td>
+                                    <td>134</td>
+                                </tr>
+                                <tr style="background:#fdf4ff;">
+                                    <td class="t-level">LoD 2</td>
+                                    <td class="t-scalable t-yes">✓</td>
+                                    <td>23.62</td>
+                                    <td>0.818</td>
+                                    <td>0.310</td>
+                                    <td>7.7</td>
+                                    <td>93</td>
+                                    <td>121</td>
+                                </tr>
+                                <tr style="background:#fdf4ff;">
+                                    <td class="t-level">LoD 3</td>
+                                    <td class="t-scalable t-yes">✓</td>
+                                    <td>23.98</td>
+                                    <td>0.834</td>
+                                    <td>0.281</td>
+                                    <td>10.3</td>
+                                    <td>127</td>
+                                    <td>107</td>
+                                </tr>
+                                <tr style="background:#fdf4ff;">
+                                    <td class="t-level">LoD 4</td>
+                                    <td class="t-scalable t-yes">✓</td>
+                                    <td>24.25</td>
+                                    <td>0.848</td>
+                                    <td>0.256</td>
+                                    <td>13.7</td>
+                                    <td>173</td>
+                                    <td>92</td>
+                                </tr>
+                                <tr style="background:#fdf4ff;">
+                                    <td class="t-level">LoD 5</td>
+                                    <td class="t-scalable t-yes">✓</td>
+                                    <td>24.45</td>
+                                    <td>0.859</td>
+                                    <td>0.235</td>
+                                    <td>18.2</td>
+                                    <td>235</td>
+                                    <td>78</td>
+                                </tr>
+                                <tr style="background:#fdf4ff;">
+                                    <td class="t-level">LoD 6</td>
+                                    <td class="t-scalable t-yes">✓</td>
+                                    <td class="t-second">24.57</td>
+                                    <td class="t-second">0.866</td>
+                                    <td>0.223</td>
+                                    <td>24.1</td>
+                                    <td>321</td>
+                                    <td>66</td>
+                                </tr>
+                                <tr style="background:#fdf4ff;">
+                                    <td class="t-level">LoD 7</td>
+                                    <td class="t-scalable t-yes">✓</td>
+                                    <td class="t-best">24.61</td>
+                                    <td class="t-best">0.868</td>
+                                    <td>0.219</td>
+                                    <td>31.0</td>
+                                    <td>438</td>
+                                    <td>60</td>
+                                </tr>
+                                <tr>
+                                    <td rowspan="3" class="t-method-name">Context-GS</td>
+                                    <td class="t-level">high</td>
+                                    <td class="t-scalable t-no">✗</td>
+                                    <td>24.17</td>
+                                    <td>0.856</td>
+                                    <td>0.215</td>
+                                    <td>10.0</td>
+                                    <td>222</td>
+                                    <td>77</td>
+                                </tr>
+                                <tr>
+                                    <td class="t-level">med</td>
+                                    <td class="t-scalable t-no">✗</td>
+                                    <td>24.30</td>
+                                    <td>0.856</td>
+                                    <td>0.214</td>
+                                    <td>10.0</td>
+                                    <td>247</td>
+                                    <td>78</td>
+                                </tr>
+                                <tr>
+                                    <td class="t-level">low</td>
+                                    <td class="t-scalable t-no">✗</td>
+                                    <td>24.25</td>
+                                    <td>0.855</td>
+                                    <td>0.218</td>
+                                    <td>10.3</td>
+                                    <td>251</td>
+                                    <td>77</td>
+                                </tr>
+                                <tr>
+                                    <td rowspan="3" class="t-method-name">HAC</td>
+                                    <td class="t-level">high</td>
+                                    <td class="t-scalable t-no">✗</td>
+                                    <td>24.03</td>
+                                    <td>0.843</td>
+                                    <td>0.237</td>
+                                    <td>7.4</td>
+                                    <td>261</td>
+                                    <td>82</td>
+                                </tr>
+                                <tr>
+                                    <td class="t-level">med</td>
+                                    <td class="t-scalable t-no">✗</td>
+                                    <td>24.05</td>
+                                    <td>0.846</td>
+                                    <td>0.222</td>
+                                    <td>7.9</td>
+                                    <td>300</td>
+                                    <td>85</td>
+                                </tr>
+                                <tr>
+                                    <td class="t-level">low</td>
+                                    <td class="t-scalable t-no">✗</td>
+                                    <td>24.37</td>
+                                    <td>0.853</td>
+                                    <td>0.215</td>
+                                    <td>11.1</td>
+                                    <td>307</td>
+                                    <td>88</td>
+                                </tr>
+                                <tr>
+                                    <td rowspan="3" class="t-method-name">RDO</td>
+                                    <td class="t-level">high</td>
+                                    <td class="t-scalable t-no">✗</td>
+                                    <td>23.19</td>
+                                    <td>0.827</td>
+                                    <td>0.253</td>
+                                    <td>5.5</td>
+                                    <td>395</td>
+                                    <td>370</td>
+                                </tr>
+                                <tr>
+                                    <td class="t-level">med</td>
+                                    <td class="t-scalable t-no">✗</td>
+                                    <td>23.16</td>
+                                    <td>0.833</td>
+                                    <td>0.239</td>
+                                    <td>8.0</td>
+                                    <td>598</td>
+                                    <td>307</td>
+                                </tr>
+                                <tr>
+                                    <td class="t-level">low</td>
+                                    <td class="t-scalable t-no">✗</td>
+                                    <td>23.32</td>
+                                    <td>0.839</td>
+                                    <td>0.232</td>
+                                    <td>11.9</td>
+                                    <td>912</td>
+                                    <td>257</td>
+                                </tr>
+                                <tr>
+                                    <td rowspan="3" class="t-method-name">Reduced-3DGS</td>
+                                    <td class="t-level">high</td>
+                                    <td class="t-scalable t-no">✗</td>
+                                    <td>23.46</td>
+                                    <td>0.840</td>
+                                    <td>0.228</td>
+                                    <td>10.5</td>
+                                    <td>558</td>
+                                    <td>384</td>
+                                </tr>
+                                <tr>
+                                    <td class="t-level">med</td>
+                                    <td class="t-scalable t-no">✗</td>
+                                    <td>23.55</td>
+                                    <td>0.843</td>
+                                    <td>0.223</td>
+                                    <td>14.0</td>
+                                    <td>656</td>
+                                    <td>358</td>
+                                </tr>
+                                <tr>
+                                    <td class="t-level">low</td>
+                                    <td class="t-scalable t-no">✗</td>
+                                    <td>23.57</td>
+                                    <td>0.844</td>
+                                    <td>0.221</td>
+                                    <td>20.7</td>
+                                    <td>648</td>
+                                    <td>360</td>
+                                </tr>
+                                <tr>
+                                    <td rowspan="3" class="t-method-name">Comp-GS</td>
+                                    <td class="t-level">high</td>
+                                    <td class="t-scalable t-no">✗</td>
+                                    <td>23.06</td>
+                                    <td>0.816</td>
+                                    <td>0.278</td>
+                                    <td>6.1</td>
+                                    <td>270</td>
+                                    <td>334</td>
+                                </tr>
+                                <tr>
+                                    <td class="t-level">med</td>
+                                    <td class="t-scalable t-no">✗</td>
+                                    <td>23.32</td>
+                                    <td>0.828</td>
+                                    <td>0.259</td>
+                                    <td>7.3</td>
+                                    <td>242</td>
+                                    <td>311</td>
+                                </tr>
+                                <tr>
+                                    <td class="t-level">low</td>
+                                    <td class="t-scalable t-no">✗</td>
+                                    <td>23.62</td>
+                                    <td>0.837</td>
+                                    <td>0.248</td>
+                                    <td>9.8</td>
+                                    <td>241</td>
+                                    <td>286</td>
+                                </tr>
+                                <tr>
+                                    <td rowspan="2" class="t-method-name">SOG</td>
+                                    <td class="t-level">high</td>
+                                    <td class="t-scalable t-no">✗</td>
+                                    <td>23.15</td>
+                                    <td>0.828</td>
+                                    <td class="t-second">0.198</td>
+                                    <td>9.3</td>
+                                    <td>1207</td>
+                                    <td>216</td>
+                                </tr>
+                                <tr>
+                                    <td class="t-level">low</td>
+                                    <td class="t-scalable t-no">✗</td>
+                                    <td>23.56</td>
+                                    <td>0.837</td>
+                                    <td class="t-best">0.186</td>
+                                    <td>22.8</td>
+                                    <td>1242</td>
+                                    <td>227</td>
+                                </tr>
+                                <tr>
+                                    <td rowspan="1" class="t-method-name">EAGLES</td>
+                                    <td class="t-level">—</td>
+                                    <td class="t-scalable t-no">✗</td>
+                                    <td>23.20</td>
+                                    <td>0.837</td>
+                                    <td>0.241</td>
+                                    <td>28.9</td>
+                                    <td>651</td>
+                                    <td>227</td>
+                                </tr>
+                                <tr>
+                                    <td rowspan="1" class="t-method-name">LightGS</td>
+                                    <td class="t-level">—</td>
+                                    <td class="t-scalable t-no">✗</td>
+                                    <td>23.55</td>
+                                    <td>0.839</td>
+                                    <td>0.235</td>
+                                    <td>28.5</td>
+                                    <td>1211</td>
+                                    <td>225</td>
+                                </tr>
+                                <tr>
+                                    <td rowspan="1" class="t-method-name">Compact-3DGS</td>
+                                    <td class="t-level">—</td>
+                                    <td class="t-scalable t-no">✗</td>
+                                    <td>23.41</td>
+                                    <td>0.836</td>
+                                    <td>0.238</td>
+                                    <td>20.9</td>
+                                    <td>842</td>
+                                    <td>147</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="tab-pane fade " id="tab-db" role="tabpanel">
+                    <div class="table-responsive">
+                        <table class="comp-table">
+                            <thead>
+                                <tr>
+                                    <th rowspan="2" class="t-th-method">Method</th>
+                                    <th rowspan="2" class="t-th-level">Level</th>
+                                    <th rowspan="2" class="t-th-scalable">Scalable</th>
+                                    <th colspan="6" class="t-th-dataset">Deep Blending</th>
+                                </tr>
+                                <tr>
+                                    <th>PSNR&nbsp;↑</th>
+                                    <th>SSIM&nbsp;↑</th>
+                                    <th>LPIPS&nbsp;↓</th>
+                                    <th>Size&nbsp;↓</th>
+                                    <th>W&nbsp;↓</th>
+                                    <th>FPS&nbsp;↑</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr style="background:#eff6ff;">
+                                    <td rowspan="8" class="t-method-name"><span class="t-ours-badge"
+                                            style="background:#2563eb;">Ours</span> 3DGS-MCMC</td>
+                                    <td class="t-level">LoD 0</td>
+                                    <td class="t-scalable t-yes">✓</td>
+                                    <td>29.03</td>
+                                    <td>0.886</td>
+                                    <td>0.376</td>
+                                    <td>4.1</td>
+                                    <td>100</td>
+                                    <td class="t-best">652</td>
+                                </tr>
+                                <tr style="background:#eff6ff;">
+                                    <td class="t-level">LoD 1</td>
+                                    <td class="t-scalable t-yes">✓</td>
+                                    <td>29.39</td>
+                                    <td>0.893</td>
+                                    <td>0.362</td>
+                                    <td>5.5</td>
+                                    <td>146</td>
+                                    <td class="t-second">568</td>
+                                </tr>
+                                <tr style="background:#eff6ff;">
+                                    <td class="t-level">LoD 2</td>
+                                    <td class="t-scalable t-yes">✓</td>
+                                    <td>29.54</td>
+                                    <td>0.897</td>
+                                    <td>0.351</td>
+                                    <td>7.5</td>
+                                    <td>212</td>
+                                    <td>489</td>
+                                </tr>
+                                <tr style="background:#eff6ff;">
+                                    <td class="t-level">LoD 3</td>
+                                    <td class="t-scalable t-yes">✓</td>
+                                    <td>29.61</td>
+                                    <td>0.900</td>
+                                    <td>0.342</td>
+                                    <td>10.3</td>
+                                    <td>310</td>
+                                    <td>419</td>
+                                </tr>
+                                <tr style="background:#eff6ff;">
+                                    <td class="t-level">LoD 4</td>
+                                    <td class="t-scalable t-yes">✓</td>
+                                    <td>29.64</td>
+                                    <td>0.901</td>
+                                    <td>0.336</td>
+                                    <td>14.1</td>
+                                    <td>452</td>
+                                    <td>360</td>
+                                </tr>
+                                <tr style="background:#eff6ff;">
+                                    <td class="t-level">LoD 5</td>
+                                    <td class="t-scalable t-yes">✓</td>
+                                    <td>29.65</td>
+                                    <td>0.901</td>
+                                    <td>0.331</td>
+                                    <td>19.3</td>
+                                    <td>660</td>
+                                    <td>311</td>
+                                </tr>
+                                <tr style="background:#eff6ff;">
+                                    <td class="t-level">LoD 6</td>
+                                    <td class="t-scalable t-yes">✓</td>
+                                    <td>29.65</td>
+                                    <td>0.902</td>
+                                    <td>0.327</td>
+                                    <td>26.5</td>
+                                    <td>965</td>
+                                    <td>263</td>
+                                </tr>
+                                <tr style="background:#eff6ff;">
+                                    <td class="t-level">LoD 7</td>
+                                    <td class="t-scalable t-yes">✓</td>
+                                    <td>29.61</td>
+                                    <td>0.901</td>
+                                    <td>0.326</td>
+                                    <td>36.1</td>
+                                    <td>1411</td>
+                                    <td>220</td>
+                                </tr>
+                                <tr style="background:#f0fdf4;">
+                                    <td rowspan="8" class="t-method-name"><span class="t-ours-badge"
+                                            style="background:#16a34a;">Ours</span> Scaffold-GS</td>
+                                    <td class="t-level">LoD 0</td>
+                                    <td class="t-scalable t-yes">✓</td>
+                                    <td>29.75</td>
+                                    <td>0.897</td>
+                                    <td>0.358</td>
+                                    <td>4.0</td>
+                                    <td class="t-best">50</td>
+                                    <td>178</td>
+                                </tr>
+                                <tr style="background:#f0fdf4;">
+                                    <td class="t-level">LoD 1</td>
+                                    <td class="t-scalable t-yes">✓</td>
+                                    <td>30.00</td>
+                                    <td>0.901</td>
+                                    <td>0.349</td>
+                                    <td>4.6</td>
+                                    <td>58</td>
+                                    <td>172</td>
+                                </tr>
+                                <tr style="background:#f0fdf4;">
+                                    <td class="t-level">LoD 2</td>
+                                    <td class="t-scalable t-yes">✓</td>
+                                    <td>30.15</td>
+                                    <td>0.904</td>
+                                    <td>0.343</td>
+                                    <td>5.4</td>
+                                    <td>68</td>
+                                    <td>169</td>
+                                </tr>
+                                <tr style="background:#f0fdf4;">
+                                    <td class="t-level">LoD 3</td>
+                                    <td class="t-scalable t-yes">✓</td>
+                                    <td>30.23</td>
+                                    <td>0.906</td>
+                                    <td>0.338</td>
+                                    <td>6.2</td>
+                                    <td>80</td>
+                                    <td>165</td>
+                                </tr>
+                                <tr style="background:#f0fdf4;">
+                                    <td class="t-level">LoD 4</td>
+                                    <td class="t-scalable t-yes">✓</td>
+                                    <td>30.29</td>
+                                    <td>0.908</td>
+                                    <td>0.334</td>
+                                    <td>7.2</td>
+                                    <td>93</td>
+                                    <td>161</td>
+                                </tr>
+                                <tr style="background:#f0fdf4;">
+                                    <td class="t-level">LoD 5</td>
+                                    <td class="t-scalable t-yes">✓</td>
+                                    <td>30.33</td>
+                                    <td>0.909</td>
+                                    <td>0.331</td>
+                                    <td>8.4</td>
+                                    <td>109</td>
+                                    <td>155</td>
+                                </tr>
+                                <tr style="background:#f0fdf4;">
+                                    <td class="t-level">LoD 6</td>
+                                    <td class="t-scalable t-yes">✓</td>
+                                    <td class="t-best">30.35</td>
+                                    <td>0.909</td>
+                                    <td>0.329</td>
+                                    <td>9.7</td>
+                                    <td>127</td>
+                                    <td>151</td>
+                                </tr>
+                                <tr style="background:#f0fdf4;">
+                                    <td class="t-level">LoD 7</td>
+                                    <td class="t-scalable t-yes">✓</td>
+                                    <td>30.33</td>
+                                    <td>0.909</td>
+                                    <td>0.328</td>
+                                    <td>11.3</td>
+                                    <td>149</td>
+                                    <td>148</td>
+                                </tr>
+                                <tr style="background:#fdf4ff;">
+                                    <td rowspan="8" class="t-method-name"><span class="t-ours-badge"
+                                            style="background:#9333ea;">Ours</span> Octree-GS</td>
+                                    <td class="t-level">LoD 0</td>
+                                    <td class="t-scalable t-yes">✓</td>
+                                    <td>29.38</td>
+                                    <td>0.891</td>
+                                    <td>0.365</td>
+                                    <td class="t-second">3.7</td>
+                                    <td class="t-best">50</td>
+                                    <td>213</td>
+                                </tr>
+                                <tr style="background:#fdf4ff;">
+                                    <td class="t-level">LoD 1</td>
+                                    <td class="t-scalable t-yes">✓</td>
+                                    <td>29.65</td>
+                                    <td>0.895</td>
+                                    <td>0.359</td>
+                                    <td>4.1</td>
+                                    <td class="t-second">56</td>
+                                    <td>212</td>
+                                </tr>
+                                <tr style="background:#fdf4ff;">
+                                    <td class="t-level">LoD 2</td>
+                                    <td class="t-scalable t-yes">✓</td>
+                                    <td>29.81</td>
+                                    <td>0.897</td>
+                                    <td>0.354</td>
+                                    <td>4.6</td>
+                                    <td>64</td>
+                                    <td>212</td>
+                                </tr>
+                                <tr style="background:#fdf4ff;">
+                                    <td class="t-level">LoD 3</td>
+                                    <td class="t-scalable t-yes">✓</td>
+                                    <td>29.91</td>
+                                    <td>0.899</td>
+                                    <td>0.350</td>
+                                    <td>5.1</td>
+                                    <td>72</td>
+                                    <td>205</td>
+                                </tr>
+                                <tr style="background:#fdf4ff;">
+                                    <td class="t-level">LoD 4</td>
+                                    <td class="t-scalable t-yes">✓</td>
+                                    <td>29.97</td>
+                                    <td>0.900</td>
+                                    <td>0.347</td>
+                                    <td>5.7</td>
+                                    <td>81</td>
+                                    <td>200</td>
+                                </tr>
+                                <tr style="background:#fdf4ff;">
+                                    <td class="t-level">LoD 5</td>
+                                    <td class="t-scalable t-yes">✓</td>
+                                    <td>30.02</td>
+                                    <td>0.901</td>
+                                    <td>0.344</td>
+                                    <td>6.4</td>
+                                    <td>91</td>
+                                    <td>195</td>
+                                </tr>
+                                <tr style="background:#fdf4ff;">
+                                    <td class="t-level">LoD 6</td>
+                                    <td class="t-scalable t-yes">✓</td>
+                                    <td>30.03</td>
+                                    <td>0.901</td>
+                                    <td>0.343</td>
+                                    <td>7.1</td>
+                                    <td>103</td>
+                                    <td>194</td>
+                                </tr>
+                                <tr style="background:#fdf4ff;">
+                                    <td class="t-level">LoD 7</td>
+                                    <td class="t-scalable t-yes">✓</td>
+                                    <td>30.03</td>
+                                    <td>0.901</td>
+                                    <td>0.342</td>
+                                    <td>7.8</td>
+                                    <td>116</td>
+                                    <td>192</td>
+                                </tr>
+                                <tr>
+                                    <td rowspan="3" class="t-method-name">Context-GS</td>
+                                    <td class="t-level">high</td>
+                                    <td class="t-scalable t-no">✗</td>
+                                    <td>30.10</td>
+                                    <td>0.907</td>
+                                    <td>0.341</td>
+                                    <td class="t-best">3.4</td>
+                                    <td>155</td>
+                                    <td>121</td>
+                                </tr>
+                                <tr>
+                                    <td class="t-level">med</td>
+                                    <td class="t-scalable t-no">✗</td>
+                                    <td>30.30</td>
+                                    <td class="t-best">0.911</td>
+                                    <td>0.332</td>
+                                    <td>5.5</td>
+                                    <td>167</td>
+                                    <td>133</td>
+                                </tr>
+                                <tr>
+                                    <td class="t-level">low</td>
+                                    <td class="t-scalable t-no">✗</td>
+                                    <td>30.27</td>
+                                    <td class="t-best">0.911</td>
+                                    <td>0.329</td>
+                                    <td>6.7</td>
+                                    <td>181</td>
+                                    <td>135</td>
+                                </tr>
+                                <tr>
+                                    <td rowspan="3" class="t-method-name">HAC</td>
+                                    <td class="t-level">high</td>
+                                    <td class="t-scalable t-no">✗</td>
+                                    <td>29.92</td>
+                                    <td>0.903</td>
+                                    <td class="t-best">0.250</td>
+                                    <td>3.9</td>
+                                    <td>180</td>
+                                    <td>166</td>
+                                </tr>
+                                <tr>
+                                    <td class="t-level">med</td>
+                                    <td class="t-scalable t-no">✗</td>
+                                    <td>29.98</td>
+                                    <td>0.904</td>
+                                    <td>0.340</td>
+                                    <td>4.1</td>
+                                    <td>187</td>
+                                    <td>173</td>
+                                </tr>
+                                <tr>
+                                    <td class="t-level">low</td>
+                                    <td class="t-scalable t-no">✗</td>
+                                    <td class="t-second">30.34</td>
+                                    <td>0.909</td>
+                                    <td>0.329</td>
+                                    <td>6.3</td>
+                                    <td>196</td>
+                                    <td>166</td>
+                                </tr>
+                                <tr>
+                                    <td rowspan="3" class="t-method-name">RDO</td>
+                                    <td class="t-level">high</td>
+                                    <td class="t-scalable t-no">✗</td>
+                                    <td>29.61</td>
+                                    <td>0.903</td>
+                                    <td>0.331</td>
+                                    <td>7.0</td>
+                                    <td>531</td>
+                                    <td>335</td>
+                                </tr>
+                                <tr>
+                                    <td class="t-level">med</td>
+                                    <td class="t-scalable t-no">✗</td>
+                                    <td>29.68</td>
+                                    <td>0.905</td>
+                                    <td>0.323</td>
+                                    <td>11.0</td>
+                                    <td>891</td>
+                                    <td>269</td>
+                                </tr>
+                                <tr>
+                                    <td class="t-level">low</td>
+                                    <td class="t-scalable t-no">✗</td>
+                                    <td>29.72</td>
+                                    <td>0.906</td>
+                                    <td>0.318</td>
+                                    <td>18.0</td>
+                                    <td>1478</td>
+                                    <td>200</td>
+                                </tr>
+                                <tr>
+                                    <td rowspan="3" class="t-method-name">Reduced-3DGS</td>
+                                    <td class="t-level">high</td>
+                                    <td class="t-scalable t-no">✗</td>
+                                    <td>29.63</td>
+                                    <td>0.906</td>
+                                    <td>0.318</td>
+                                    <td>13.6</td>
+                                    <td>804</td>
+                                    <td>337</td>
+                                </tr>
+                                <tr>
+                                    <td class="t-level">med</td>
+                                    <td class="t-scalable t-no">✗</td>
+                                    <td>29.70</td>
+                                    <td>0.907</td>
+                                    <td>0.315</td>
+                                    <td>18.3</td>
+                                    <td>990</td>
+                                    <td>304</td>
+                                </tr>
+                                <tr>
+                                    <td class="t-level">low</td>
+                                    <td class="t-scalable t-no">✗</td>
+                                    <td>29.69</td>
+                                    <td>0.907</td>
+                                    <td>0.314</td>
+                                    <td>35.3</td>
+                                    <td>988</td>
+                                    <td>311</td>
+                                </tr>
+                                <tr>
+                                    <td rowspan="3" class="t-method-name">Comp-GS</td>
+                                    <td class="t-level">high</td>
+                                    <td class="t-scalable t-no">✗</td>
+                                    <td>29.22</td>
+                                    <td>0.894</td>
+                                    <td>0.369</td>
+                                    <td>6.0</td>
+                                    <td>311</td>
+                                    <td>440</td>
+                                </tr>
+                                <tr>
+                                    <td class="t-level">med</td>
+                                    <td class="t-scalable t-no">✗</td>
+                                    <td>29.56</td>
+                                    <td>0.899</td>
+                                    <td>0.351</td>
+                                    <td>7.1</td>
+                                    <td>271</td>
+                                    <td>315</td>
+                                </tr>
+                                <tr>
+                                    <td class="t-level">low</td>
+                                    <td class="t-scalable t-no">✗</td>
+                                    <td>29.89</td>
+                                    <td>0.904</td>
+                                    <td>0.336</td>
+                                    <td>10.0</td>
+                                    <td>246</td>
+                                    <td>254</td>
+                                </tr>
+                                <tr>
+                                    <td rowspan="2" class="t-method-name">SOG</td>
+                                    <td class="t-level">high</td>
+                                    <td class="t-scalable t-no">✗</td>
+                                    <td>29.12</td>
+                                    <td>0.892</td>
+                                    <td>0.270</td>
+                                    <td>9.3</td>
+                                    <td>800</td>
+                                    <td>219</td>
+                                </tr>
+                                <tr>
+                                    <td class="t-level">low</td>
+                                    <td class="t-scalable t-no">✗</td>
+                                    <td>29.26</td>
+                                    <td>0.894</td>
+                                    <td class="t-second">0.268</td>
+                                    <td>17.7</td>
+                                    <td>890</td>
+                                    <td>236</td>
+                                </tr>
+                                <tr>
+                                    <td rowspan="1" class="t-method-name">EAGLES</td>
+                                    <td class="t-level">—</td>
+                                    <td class="t-scalable t-no">✗</td>
+                                    <td>29.75</td>
+                                    <td class="t-second">0.910</td>
+                                    <td>0.318</td>
+                                    <td>52.4</td>
+                                    <td>1192</td>
+                                    <td>144</td>
+                                </tr>
+                                <tr>
+                                    <td rowspan="1" class="t-method-name">LightGS</td>
+                                    <td class="t-level">—</td>
+                                    <td class="t-scalable t-no">✗</td>
+                                    <td>29.41</td>
+                                    <td>0.904</td>
+                                    <td>0.329</td>
+                                    <td>43.2</td>
+                                    <td>956</td>
+                                    <td>348</td>
+                                </tr>
+                                <tr>
+                                    <td rowspan="1" class="t-method-name">Compact-3DGS</td>
+                                    <td class="t-level">—</td>
+                                    <td class="t-scalable t-no">✗</td>
+                                    <td>29.76</td>
+                                    <td>0.905</td>
+                                    <td>0.324</td>
+                                    <td>23.8</td>
+                                    <td>1053</td>
+                                    <td>144</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ═══════════ PERFORMANCE TABLE ═══════════ -->
+    <div class="container mb-4">
+        <div class="section-card">
+            <hr class="section-line">
+            <h2 class="section-title">Training &amp; Decoding Performance</h2>
+            <p class="body-text" style="max-width:860px; margin-bottom:20px;">
+                Encoding and decoding times in seconds; training time in hours.
+                For non-scalable methods, training time refers to a single compression level — obtaining multiple
+                operating points would require training multiple models.
+                GoDe produces all levels within a single training run.
+            </p>
+
+            <!-- Sub-table 1: Baselines -->
+            <div class="table-responsive mb-4">
+                <table class="comp-table">
+                    <thead>
+                        <tr>
+                            <th class="t-th-method" style="text-align:left; min-width:70px;"></th>
+                            <th colspan="3" class="t-th-dataset">Context-GS</th>
+                            <th colspan="3" class="t-th-dataset"
+                                style="background:#f0fdf4; color:#15803d; border-bottom-color:#86efac !important;">HAC
+                            </th>
+                            <th colspan="3" class="t-th-dataset"
+                                style="background:#fdf4ff; color:#7e22ce; border-bottom-color:#d8b4fe !important;">
+                                RDO-GS</th>
+                            <th colspan="3" class="t-th-dataset"
+                                style="background:#fff7ed; color:#c2410c; border-bottom-color:#fed7aa !important;">
+                                Comp-GS</th>
+                        </tr>
+                        <tr>
+                            <th class="t-th-method" style="text-align:left;">Level</th>
+                            <th>Enc&nbsp;↓</th>
+                            <th>Dec&nbsp;↓</th>
+                            <th>Train&nbsp;↓</th>
+                            <th>Enc&nbsp;↓</th>
+                            <th>Dec&nbsp;↓</th>
+                            <th>Train&nbsp;↓</th>
+                            <th>Enc&nbsp;↓</th>
+                            <th>Dec&nbsp;↓</th>
+                            <th>Train&nbsp;↓</th>
+                            <th>Enc&nbsp;↓</th>
+                            <th>Dec&nbsp;↓</th>
+                            <th>Train&nbsp;↓</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="t-level" style="text-align:left; font-weight:600; color:#374151;">High</td>
+                            <td>52.7</td>
+                            <td>53.1</td>
+                            <td>1.33</td>
+                            <td>8.6</td>
+                            <td>11.8</td>
+                            <td>1.19</td>
+                            <td>1.1</td>
+                            <td>2.2</td>
+                            <td>1.31</td>
+                            <td>10.8</td>
+                            <td>9.1</td>
+                            <td>1.63</td>
+                        </tr>
+                        <tr>
+                            <td class="t-level" style="text-align:left; font-weight:600; color:#374151;">Medium</td>
+                            <td>87.8</td>
+                            <td>82.5</td>
+                            <td></td>
+                            <td>9.7</td>
+                            <td>12.5</td>
+                            <td></td>
+                            <td>2.9</td>
+                            <td>7.4</td>
+                            <td></td>
+                            <td>10.8</td>
+                            <td>9.0</td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td class="t-level" style="text-align:left; font-weight:600; color:#374151;">Low</td>
+                            <td>97.2</td>
+                            <td>88.1</td>
+                            <td></td>
+                            <td>14.9</td>
+                            <td>17.9</td>
+                            <td></td>
+                            <td>4.8</td>
+                            <td>19.0</td>
+                            <td></td>
+                            <td>10.9</td>
+                            <td>8.8</td>
+                            <td></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Sub-table 2: Ours -->
+            <div class="table-responsive">
+                <table class="comp-table">
+                    <thead>
+                        <tr>
+                            <th class="t-th-method" style="text-align:left; min-width:70px;"></th>
+                            <th colspan="3" class="t-th-dataset">
+                                <span class="t-ours-badge" style="background:#2563eb; font-size:0.7rem;">Ours</span>
+                                3DGS
+                            </th>
+                            <th colspan="3" class="t-th-dataset"
+                                style="background:#f0fdf4; color:#15803d; border-bottom-color:#86efac !important;">
+                                <span class="t-ours-badge" style="background:#16a34a; font-size:0.7rem;">Ours</span>
+                                Scaffold-GS
+                            </th>
+                            <th colspan="3" class="t-th-dataset"
+                                style="background:#fdf4ff; color:#7e22ce; border-bottom-color:#d8b4fe !important;">
+                                <span class="t-ours-badge" style="background:#9333ea; font-size:0.7rem;">Ours</span>
+                                Octree-GS
+                            </th>
+                        </tr>
+                        <tr>
+                            <th class="t-th-method" style="text-align:left;">Level</th>
+                            <th>Enc&nbsp;↓</th>
+                            <th>Dec&nbsp;↓</th>
+                            <th>Train&nbsp;↓</th>
+                            <th>Enc&nbsp;↓</th>
+                            <th>Dec&nbsp;↓</th>
+                            <th>Train&nbsp;↓</th>
+                            <th>Enc&nbsp;↓</th>
+                            <th>Dec&nbsp;↓</th>
+                            <th>Train&nbsp;↓</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr style="background:#f8faff;">
+                            <td class="t-level" style="text-align:left; font-weight:600; color:#374151;">High</td>
+                            <td>10.6</td>
+                            <td class="t-best">1.2</td>
+                            <td>1.20</td>
+                            <td>2.1</td>
+                            <td class="t-best">0.2</td>
+                            <td>0.57</td>
+                            <td>5.0</td>
+                            <td class="t-best">0.2</td>
+                            <td>1.12</td>
+                        </tr>
+                        <tr style="background:#f8faff;">
+                            <td class="t-level" style="text-align:left; font-weight:600; color:#374151;">Medium</td>
+                            <td>18.1</td>
+                            <td class="t-best">1.9</td>
+                            <td colspan="1" rowspan="2"
+                                style="vertical-align:middle; text-align:center; font-style:italic; color:#94a3b8; font-size:0.7rem;">
+                                same<br>run</td>
+                            <td>2.9</td>
+                            <td class="t-best">0.3</td>
+                            <td colspan="1" rowspan="2"
+                                style="vertical-align:middle; text-align:center; font-style:italic; color:#94a3b8; font-size:0.7rem;">
+                                same<br>run</td>
+                            <td>6.6</td>
+                            <td class="t-best">0.3</td>
+                            <td colspan="1" rowspan="2"
+                                style="vertical-align:middle; text-align:center; font-style:italic; color:#94a3b8; font-size:0.7rem;">
+                                same<br>run</td>
+                        </tr>
+                        <tr style="background:#f8faff;">
+                            <td class="t-level" style="text-align:left; font-weight:600; color:#374151;">Low</td>
+                            <td>32.7</td>
+                            <td class="t-best">2.4</td>
+                            <td>4.2</td>
+                            <td class="t-best">0.5</td>
+                            <td>8.8</td>
+                            <td class="t-best">0.3</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <p class="fig-caption mt-2">Bold Dec values indicate best decoding times. GoDe achieves up to
+                <strong>1762×</strong> faster decoding compared to Context-GS at matched compression rates.</p>
+
+        </div>
+    </div>
+
+    <!-- ═══════════ CITATION ═══════════ -->
+    <div class="container mb-4">
+        <div class="section-card">
+            <hr class="section-line">
+            <h2 class="section-title">Citation</h2>
+            <div class="citation-block">
+                <button class="copy-btn" onclick="copyCitation(this)">Copy</button>@article{di2025gode,
+                title = {GoDe: Gaussians on Demand for Progressive Level of Detail and Scalable Compression},
+                author = {Di Sario, Francesco and Renzulli, Riccardo and Grangetto, Marco
+                and Sugimoto, Akihiro and Tartaglione, Enzo},
+                journal = {arXiv preprint arXiv:2501.13558},
+                year = {2025}
+                }
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ═══════════ FOOTER ═══════════ -->
+    <footer>
+        <div class="container text-center">
+            <p class="mb-1">GoDe &middot; University of Turin &middot; National Institute of Informatics &middot;
+                Télécom Paris, IPP</p>
+            <p class="mb-0">
+                This website is licensed under a
+                <a href="http://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0
+                    International License</a>.
+            </p>
+        </div>
+    </footer>
+
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function copyCitation(btn) {
+            const text = `@article{di2025gode,
+  title   = {GoDe: Gaussians on Demand for Progressive Level of Detail and Scalable Compression},
+  author  = {Di Sario, Francesco and Renzulli, Riccardo and Grangetto, Marco and Sugimoto, Akihiro and Tartaglione, Enzo},
+  journal = {arXiv preprint arXiv:2501.13558},
+  year    = {2025}
+}`;
+            navigator.clipboard.writeText(text).then(() => {
+                btn.textContent = 'Copied ✓';
+                setTimeout(() => btn.textContent = 'Copy', 2000);
+            });
+        }
+    </script>
+    <script>
+        var LOD_DATA = {
+            bicycle: [{ fps: 511, psnr: 23.09, size: 4.10, w: '100k' }, { fps: 425, psnr: 23.79, size: 6.58, w: '173k' }, { fps: 353, psnr: 24.29, size: 10.79, w: '298k' }, { fps: 281, psnr: 24.67, size: 17.95, w: '514k' }, { fps: 224, psnr: 24.91, size: 29.95, w: '888k' }, { fps: 170, psnr: 25.09, size: 49.45, w: '1533k' }, { fps: 124, psnr: 25.15, size: 80.44, w: '2646k' }, { fps: 99, psnr: 25.16, size: 121.93, w: '4569k' }],
+            bonsai: [{ fps: 315, psnr: 29.56, size: 4.16, w: '100k' }, { fps: 291, psnr: 30.75, size: 5.34, w: '138k' }, { fps: 258, psnr: 31.30, size: 6.80, w: '190k' }, { fps: 234, psnr: 31.61, size: 8.66, w: '262k' }, { fps: 207, psnr: 31.78, size: 11.03, w: '361k' }, { fps: 182, psnr: 31.87, size: 14.07, w: '497k' }, { fps: 157, psnr: 31.92, size: 18.00, w: '685k' }, { fps: 150, psnr: 31.92, size: 23.07, w: '944k' }],
+            counter: [{ fps: 266, psnr: 27.59, size: 4.39, w: '100k' }, { fps: 235, psnr: 28.16, size: 5.66, w: '137k' }, { fps: 208, psnr: 28.42, size: 7.26, w: '188k' }, { fps: 190, psnr: 28.60, size: 9.29, w: '257k' }, { fps: 170, psnr: 28.71, size: 11.83, w: '352k' }, { fps: 150, psnr: 28.77, size: 15.02, w: '482k' }, { fps: 132, psnr: 28.77, size: 18.99, w: '660k' }, { fps: 120, psnr: 28.77, size: 23.83, w: '904k' }],
+            flowers: [{ fps: 526, psnr: 19.58, size: 4.43, w: '100k' }, { fps: 456, psnr: 20.28, size: 6.72, w: '160k' }, { fps: 381, psnr: 20.75, size: 10.23, w: '256k' }, { fps: 310, psnr: 21.09, size: 15.65, w: '411k' }, { fps: 253, psnr: 21.35, size: 23.91, w: '657k' }, { fps: 198, psnr: 21.53, size: 36.36, w: '1053k' }, { fps: 144, psnr: 21.60, size: 53.80, w: '1685k' }, { fps: 111, psnr: 21.64, size: 79.44, w: '2698k' }],
+            garden: [{ fps: 555, psnr: 22.83, size: 4.27, w: '100k' }, { fps: 452, psnr: 23.96, size: 6.88, w: '172k' }, { fps: 374, psnr: 25.04, size: 11.33, w: '295k' }, { fps: 298, psnr: 26.04, size: 18.83, w: '506k' }, { fps: 236, psnr: 26.69, size: 31.05, w: '870k' }, { fps: 182, psnr: 27.06, size: 50.38, w: '1493k' }, { fps: 132, psnr: 27.19, size: 79.41, w: '2564k' }, { fps: 97, psnr: 27.21, size: 119.64, w: '4404k' }],
+            kitchen: [{ fps: 277, psnr: 28.25, size: 4.33, w: '100k' }, { fps: 244, psnr: 29.43, size: 5.90, w: '145k' }, { fps: 220, psnr: 30.06, size: 7.99, w: '211k' }, { fps: 198, psnr: 30.51, size: 10.78, w: '307k' }, { fps: 176, psnr: 30.75, size: 14.37, w: '446k' }, { fps: 151, psnr: 30.90, size: 19.19, w: '649k' }, { fps: 128, psnr: 30.97, size: 25.56, w: '943k' }, { fps: 109, psnr: 30.97, size: 33.99, w: '1371k' }],
+            room: [{ fps: 282, psnr: 30.68, size: 3.64, w: '100k' }, { fps: 248, psnr: 31.14, size: 4.75, w: '142k' }, { fps: 225, psnr: 31.45, size: 6.24, w: '201k' }, { fps: 200, psnr: 31.61, size: 8.28, w: '285k' }, { fps: 175, psnr: 31.72, size: 11.06, w: '405k' }, { fps: 156, psnr: 31.78, size: 14.69, w: '574k' }, { fps: 147, psnr: 31.78, size: 19.45, w: '814k' }, { fps: 138, psnr: 31.78, size: 26.10, w: '1154k' }],
+            stump: [{ fps: 539, psnr: 24.96, size: 4.44, w: '100k' }, { fps: 441, psnr: 25.86, size: 6.97, w: '167k' }, { fps: 357, psnr: 26.45, size: 11.05, w: '279k' }, { fps: 293, psnr: 26.81, size: 17.65, w: '466k' }, { fps: 230, psnr: 27.00, size: 28.18, w: '778k' }, { fps: 177, psnr: 27.10, size: 44.77, w: '1299k' }, { fps: 128, psnr: 27.12, size: 69.06, w: '2170k' }, { fps: 96, psnr: 27.11, size: 103.41, w: '3624k' }],
+            treehill: [{ fps: 515, psnr: 21.85, size: 4.30, w: '100k' }, { fps: 433, psnr: 22.30, size: 6.51, w: '161k' }, { fps: 362, psnr: 22.63, size: 10.02, w: '259k' }, { fps: 300, psnr: 22.81, size: 15.60, w: '417k' }, { fps: 247, psnr: 22.91, size: 24.36, w: '672k' }, { fps: 204, psnr: 22.95, size: 37.90, w: '1082k' }, { fps: 157, psnr: 22.95, size: 57.32, w: '1742k' }, { fps: 129, psnr: 22.87, size: 83.73, w: '2805k' }],
+            truck: [{ fps: 562, psnr: 22.67, size: 4.04, w: '100k' }, { fps: 457, psnr: 23.77, size: 5.71, w: '153k' }, { fps: 382, psnr: 24.54, size: 8.12, w: '233k' }, { fps: 312, psnr: 25.14, size: 11.64, w: '357k' }, { fps: 238, psnr: 25.52, size: 16.73, w: '545k' }, { fps: 188, psnr: 25.74, size: 24.02, w: '832k' }, { fps: 143, psnr: 25.81, size: 34.21, w: '1271k' }, { fps: 124, psnr: 25.82, size: 48.62, w: '1942k' }],
+            train: [{ fps: 518, psnr: 21.18, size: 3.88, w: '100k' }, { fps: 450, psnr: 21.63, size: 4.97, w: '135k' }, { fps: 393, psnr: 21.91, size: 6.37, w: '182k' }, { fps: 327, psnr: 22.09, size: 8.17, w: '246k' }, { fps: 282, psnr: 22.19, size: 10.47, w: '332k' }, { fps: 243, psnr: 22.23, size: 13.39, w: '448k' }, { fps: 212, psnr: 22.27, size: 16.91, w: '604k' }, { fps: 190, psnr: 22.27, size: 21.13, w: '816k' }],
+            drjohnson: [{ fps: 846, psnr: 28.05, size: 4.05, w: '100k' }, { fps: 740, psnr: 28.49, size: 5.63, w: '149k' }, { fps: 632, psnr: 28.70, size: 7.88, w: '223k' }, { fps: 537, psnr: 28.81, size: 11.09, w: '333k' }, { fps: 455, psnr: 28.87, size: 15.66, w: '497k' }, { fps: 391, psnr: 28.89, size: 22.09, w: '742k' }, { fps: 328, psnr: 28.89, size: 31.11, w: '1108k' }, { fps: 276, psnr: 28.83, size: 43.42, w: '1654k' }],
+            playroom: [{ fps: 458, psnr: 30.01, size: 4.08, w: '100k' }, { fps: 395, psnr: 30.29, size: 5.39, w: '142k' }, { fps: 346, psnr: 30.39, size: 7.12, w: '202k' }, { fps: 301, psnr: 30.42, size: 9.43, w: '287k' }, { fps: 265, psnr: 30.41, size: 12.48, w: '407k' }, { fps: 230, psnr: 30.42, size: 16.52, w: '579k' }, { fps: 198, psnr: 30.42, size: 21.79, w: '822k' }, { fps: 164, psnr: 30.40, size: 28.73, w: '1168k' }],
+        };
+        document.addEventListener('DOMContentLoaded', function () {
+            document.querySelectorAll('.lod-viewer').forEach(function (viewer) {
+                var scene = viewer.dataset.scene;
+                var data = LOD_DATA[scene] || [];
+                var slides = viewer.querySelectorAll('.lod-slide');
+                var range = viewer.querySelector('.lod-range');
+                var numEl = viewer.querySelector('.lod-num');
+                function show(idx) {
+                    slides.forEach(function (s, i) { s.classList.toggle('active', i === idx); });
+                    if (numEl) numEl.textContent = idx;
+                    var d = data[idx];
+                    if (!d) return;
+                    viewer.querySelector('.s-fps').textContent = d.fps;
+                    viewer.querySelector('.s-psnr').textContent = d.psnr.toFixed(2);
+                    viewer.querySelector('.s-size').textContent = d.size;
+                    viewer.querySelector('.s-w').textContent = d.w;
+                }
+                range.addEventListener('input', function () { show(parseInt(this.value)); });
+                show(0);
+            });
+        });
+    </script>
+
+</body>
+
+</html>

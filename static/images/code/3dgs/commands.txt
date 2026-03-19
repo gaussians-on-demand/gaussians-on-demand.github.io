@@ -1,0 +1,34 @@
+### FOR BASELINE TRAINING ###
+
+python3 train.py -s /scratch/nerf/dataset/nerf_real_360/bicycle -i images_4 -m ./output/baseline/bicycle  --quiet --eval --test_iterations -1 --cap_max 6091454
+python3 train.py -s /scratch/nerf/dataset/nerf_real_360/flowers -i images_4 -m ./output/baseline/flowers  --quiet --eval --test_iterations -1 --cap_max 3597987
+python3 train.py -s /scratch/nerf/dataset/nerf_real_360/garden -i images_4 -m ./output/baseline/garden  --quiet --eval --test_iterations -1 --cap_max 5871850
+python3 train.py -s /scratch/nerf/dataset/nerf_real_360/stump -i images_4 -m ./output/baseline/stump  --quiet --eval --test_iterations -1 --cap_max 4832587
+python3 train.py -s /scratch/nerf/dataset/nerf_real_360/treehill -i images_4 -m ./output/baseline/treehill  --quiet --eval --test_iterations -1 --cap_max 3740475
+python3 train.py -s /scratch/nerf/dataset/nerf_real_360/room -i images_2 -m ./output/baseline/room  --quiet --eval --test_iterations -1 --cap_max 1539301
+python3 train.py -s /scratch/nerf/dataset/nerf_real_360/counter -i images_2 -m ./output/baseline/counter  --quiet --eval --test_iterations -1 --cap_max 1205418
+python3 train.py -s /scratch/nerf/dataset/nerf_real_360/kitchen -i images_2 -m ./output/baseline/kitchen  --quiet --eval --test_iterations -1 --cap_max 1827448
+python3 train.py -s /scratch/nerf/dataset/nerf_real_360/bonsai -i images_2 -m ./output/baseline/bonsai  --quiet --eval --test_iterations -1 --cap_max 1258387
+python3 train.py -s /scratch/nerf/dataset/tandt/truck -m ./output/baseline/truck  --quiet --eval --test_iterations -1 --cap_max 2582356
+python3 train.py -s /scratch/nerf/dataset/tandt/train -m ./output/baseline/train  --quiet --eval --test_iterations -1 --cap_max 1087721
+python3 train.py -s /scratch/nerf/dataset/db/drjohnson -m ./output/baseline/drjohnson  --quiet --eval --test_iterations -1 --cap_max 3298379
+python3 train.py -s /scratch/nerf/dataset/db/playroom -m ./output/baseline/playroom  --quiet --eval --test_iterations -1 --cap_max 2323837
+
+
+
+
+### FOR MULTILEVEL TRAINING ###
+
+python3 scalable_train.py -s /scratch/nerf/dataset/nerf_real_360/bicycle -i images_4 -m ./output/multilevel/bicycle/G=5_L=8_min=100000_max=0.75_ws=False --eval --eval --G 5 --num_levels 8 --min 100000 --max 0.75 --iterative --pretrained_dir ./output/baseline/bicycle
+python3 scalable_train.py -s /scratch/nerf/dataset/nerf_real_360/flowers -i images_4 -m ./output/multilevel/flowers/G=5_L=8_min=100000_max=0.75_ws=False --eval --eval --G 5 --num_levels 8 --min 100000 --max 0.75 --iterative --pretrained_dir ./output/baseline/flowers
+python3 scalable_train.py -s /scratch/nerf/dataset/nerf_real_360/garden -i images_4 -m ./output/multilevel/garden/G=5_L=8_min=100000_max=0.75_ws=False --eval --eval --G 5 --num_levels 8 --min 100000 --max 0.75 --iterative --pretrained_dir ./output/baseline/garden
+python3 scalable_train.py -s /scratch/nerf/dataset/nerf_real_360/stump -i images_4 -m ./output/multilevel/stump/G=5_L=8_min=100000_max=0.75_ws=False --eval --eval --G 5 --num_levels 8 --min 100000 --max 0.75 --iterative --pretrained_dir ./output/baseline/stump
+python3 scalable_train.py -s /scratch/nerf/dataset/nerf_real_360/treehill -i images_4 -m ./output/multilevel/treehill/G=5_L=8_min=100000_max=0.75_ws=False --eval --eval --G 5 --num_levels 8 --min 100000 --max 0.75 --iterative --pretrained_dir ./output/baseline/treehill
+python3 scalable_train.py -s /scratch/nerf/dataset/nerf_real_360/room -i images_2 -m ./output/multilevel/room/G=5_L=8_min=100000_max=0.75_ws=False --eval --eval --G 5 --num_levels 8 --min 100000 --max 0.75 --iterative --pretrained_dir ./output/baseline/room
+python3 scalable_train.py -s /scratch/nerf/dataset/nerf_real_360/counter -i images_2 -m ./output/multilevel/counter/G=5_L=8_min=100000_max=0.75_ws=False --eval --eval --G 5 --num_levels 8 --min 100000 --max 0.75 --iterative --pretrained_dir ./output/baseline/counter
+python3 scalable_train.py -s /scratch/nerf/dataset/nerf_real_360/kitchen -i images_2 -m ./output/multilevel/kitchen/G=5_L=8_min=100000_max=0.75_ws=False --eval --eval --G 5 --num_levels 8 --min 100000 --max 0.75 --iterative --pretrained_dir ./output/baseline/kitchen
+python3 scalable_train.py -s /scratch/nerf/dataset/nerf_real_360/bonsai -i images_2 -m ./output/multilevel/bonsai/G=5_L=8_min=100000_max=0.75_ws=False --eval --eval --G 5 --num_levels 8 --min 100000 --max 0.75 --iterative --pretrained_dir ./output/baseline/bonsai
+python3 scalable_train.py -s /scratch/nerf/dataset/tandt/truck  -m ./output/multilevel/truck/G=5_L=8_min=100000_max=0.75_ws=False --eval --eval --G 5 --num_levels 8 --min 100000 --max 0.75 --iterative --pretrained_dir ./output/baseline/truck
+python3 scalable_train.py -s /scratch/nerf/dataset/tandt/train  -m ./output/multilevel/train/G=5_L=8_min=100000_max=0.75_ws=False --eval --eval --G 5 --num_levels 8 --min 100000 --max 0.75 --iterative --pretrained_dir ./output/baseline/train
+python3 scalable_train.py -s /scratch/nerf/dataset/db/drjohnson  -m ./output/multilevel/drjohnson/G=5_L=8_min=100000_max=0.75_ws=False --eval --eval --G 5 --num_levels 8 --min 100000 --max 0.75 --iterative --pretrained_dir ./output/baseline/drjohnson
+python3 scalable_train.py -s /scratch/nerf/dataset/db/playroom  -m ./output/multilevel/playroom/G=5_L=8_min=100000_max=0.75_ws=False --eval --eval --G 5 --num_levels 8 --min 100000 --max 0.75 --iterative --pretrained_dir ./output/baseline/playroom
