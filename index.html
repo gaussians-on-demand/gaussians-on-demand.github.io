@@ -364,8 +364,8 @@
             <div><div class="sw-size"><i id="swSize"></i></div><div class="sw-filetext" id="swSizeText"></div></div>
           </div>
           <div class="sw-stats" id="swStats"></div>
-          <p class="sw-note">Bicycle, 3DGS-MCMC backbone. FPS measured at 1080p on an NVIDIA A40 GPU with an AMD EPYC 7402 CPU;
-            decoding takes 48&nbsp;ms for the base level and 0.91&nbsp;s for all eight.</p>
+          <p class="sw-note">Bicycle, 3DGS-MCMC backbone: the paper's results for this scene (PSNR on the test views, FPS on an
+            NVIDIA A40 GPU). Decoding all eight levels takes about 0.9&nbsp;s.</p>
         </div>
       </div>
     </section>
@@ -512,12 +512,11 @@
 
     // ---------------- level switcher: plays by itself until someone takes the slider ----------------
     (function () {
-      // bicycle, 3DGS-MCMC: primitives, MB, test PSNR; FPS of this view at 1080p on the A40, one timing run for all
-      // levels and the uncompressed model, from the view where the teaser's streaming slide ends
-      const LV = [[150000, 6.09, 23.46, 179.9], [228867, 8.91, 24.10, 159.1], [349201, 13.10, 24.54, 136.2], [532804, 19.35, 24.85, 117.2],
-                  [1004166, 34.70, 25.18, 88.7], [1532138, 50.73, 25.32, 71.5], [2337707, 73.17, 25.39, 55.6], [3566829, 101.49, 25.40, 43.1]];
-      // the uncompressed 3DGS-MCMC model GoDe starts from: Gaussians, MB, PSNR, FPS of this view
-      const ORIG = [6091454, 1437.6, 25.53, 31.6];
+      // bicycle, GoDe with 3DGS-MCMC, the paper's results (behind Table S7): primitives, MB, test PSNR, FPS on an A40
+      const LV = [[300000, 11.53, 24.18, 340], [417326, 15.93, 24.65, 300], [580538, 21.94, 24.91, 259], [807580, 30.17, 25.07, 224],
+                  [1325006, 41.33, 25.16, 190], [1843200, 56.30, 25.23, 160], [2564055, 75.85, 25.25, 129], [3566829, 99.64, 25.26, 109]];
+      // the uncompressed 3DGS-MCMC model GoDe starts from: Gaussians, MB, test PSNR (its FPS is not in the paper)
+      const ORIG = [6091454, 1437.6, 25.53];
       const NAMES = { 0: 'LOW', 3: 'MEDIUM', 5: 'HIGH', 7: 'ULTRA' };
       const TOP = LV.length - 1, TOTAL = LV[TOP][1];
       const TIP = [88 / 257, 42 / 257];                       // the fingertip in the cursor image
@@ -561,7 +560,7 @@
         $('swStats').innerHTML = [[fmtN(n), 'primitives', `uncompressed ${fmtN(ORIG[0])}`],
                                   [mb.toFixed(1) + ' MB', 'to download', `uncompressed ${(ORIG[1] / 1000).toFixed(2)} GB`],
                                   [db.toFixed(2) + ' dB', 'PSNR', `uncompressed ${ORIG[2].toFixed(2)} dB`],
-                                  [Math.round(fps), 'FPS', `uncompressed ${Math.round(ORIG[3])}`]]
+                                  [Math.round(fps), 'FPS', 'on an NVIDIA A40']]
           .map(([v, l, ref]) => `<div><b>${v}</b><span>${l}</span><small>${ref}</small></div>`).join('');
       }
       show(TOP);
@@ -569,7 +568,7 @@
       // ---- the split: uncompressed on the left, GoDe on the right ----
       const split = $('swSplit'), frameEl = $('swFrame');
       let cut = 50, splitting = false;
-      $('swHudOrig').innerHTML = `Uncompressed <span class="dim">· ${(ORIG[1] / 1000).toFixed(2)} GB · ${Math.round(ORIG[3])} fps</span>`;
+      $('swHudOrig').innerHTML = `Uncompressed <span class="dim">· ${(ORIG[1] / 1000).toFixed(2)} GB · ${ORIG[2].toFixed(2)} dB</span>`;
       function setCut(c) {
         cut = Math.min(100, Math.max(0, c));
         $('swOrig').style.clipPath = `inset(0 ${100 - cut}% 0 0)`;
