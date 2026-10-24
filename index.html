@@ -44,8 +44,9 @@
     }
     h1, h2, h3, .display { font-family: Montserrat, sans-serif; letter-spacing: -0.01em; }
     a { color: inherit; }
-    .wrap { width: min(1100px, calc(100% - 32px)); margin: 0 auto; }
-    section { padding: 64px 0 0; }
+    .wrap { width: min(1000px, calc(100% - 32px)); margin: 0 auto; }
+    section { padding: 56px 0 0; }
+    .media { max-width: 880px; margin-left: auto; margin-right: auto; }
     section > h2 {
       margin: 0;
       font-size: clamp(1.5rem, 2.6vw, 2rem);
@@ -61,8 +62,8 @@
     figcaption { margin-top: 10px; color: var(--ink-3); font-size: 0.88rem; line-height: 1.45; }
 
     /* ---------- hero ---------- */
-    .hero { padding: 72px 0 8px; text-align: center; }
-    .hero h1 { margin: 0; font-size: clamp(3.6rem, 9vw, 6.4rem); font-weight: 800; line-height: 1; }
+    .hero { padding: 52px 0 8px; text-align: center; }
+    .hero h1 { margin: 0; font-size: clamp(3rem, 7vw, 4.6rem); font-weight: 800; line-height: 1; }
     .hero .rule { width: 110px; height: 4px; margin: 22px auto 0; border-radius: 2px; background: var(--gold); }
     .hero .title {
       margin: 22px auto 0; max-width: 980px; font: 500 clamp(1.15rem, 2.4vw, 1.65rem)/1.3 Montserrat, sans-serif;
@@ -95,6 +96,7 @@
     }
 
     /* ---------- pillars ---------- */
+    .overview { display: block; width: 100%; height: auto; margin: 0 auto 22px; }
     .pillars { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
     .pillar { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 22px 22px 20px; }
     .pillar .word { font: 700 0.85rem/1 Montserrat, sans-serif; letter-spacing: 0.14em; color: var(--gold-ink); }
@@ -239,7 +241,7 @@
     .sw-size { position: relative; height: 14px; border-radius: 3px; background: var(--surface-2); overflow: hidden; }
     .sw-size i { position: absolute; left: 0; top: 0; bottom: 0; background: var(--gold-ink); }
     .sw-stats small { display: block; margin-top: 2px; font-size: 0.76rem; color: var(--ink-3); }
-    .sw-controls { padding: 20px 24px 18px; display: grid; gap: 14px; }
+    .sw-controls { padding: 14px 20px 12px; display: grid; gap: 8px; }
     .sw-row { display: grid; grid-template-columns: 108px minmax(0, 1fr); align-items: center; gap: 16px; }
     .sw-label { font: 700 0.75rem/1 Montserrat, sans-serif; letter-spacing: 0.14em; color: var(--ink-3); }
     .sw-slider { position: relative; height: 44px; cursor: pointer; touch-action: none; outline: none; }
@@ -266,7 +268,7 @@
     .sw-file span { position: relative; height: 100%; border-radius: 3px; background: var(--surface-2); overflow: hidden; }
     .sw-file i { position: absolute; left: 0; top: 0; bottom: 0; background: var(--gold-ink); }
     .sw-filetext { margin-top: 6px; font-size: 0.82rem; color: var(--ink-3); font-variant-numeric: tabular-nums; }
-    .sw-stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; border-top: 1px solid var(--line); padding-top: 14px; }
+    .sw-stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; border-top: 1px solid var(--line); padding-top: 10px; }
     .sw-stats b { display: block; font: 700 1.35rem/1.2 Montserrat, sans-serif; font-variant-numeric: tabular-nums; }
     .sw-stats span { font-size: 0.8rem; color: var(--ink-3); }
     .sw-note { margin: 0; font-size: 0.8rem; color: var(--ink-3); text-align: center; }
@@ -317,14 +319,14 @@
 
   <main class="wrap">
     <section id="video">
-      <video class="teaser-video" src="static/video/teaser.mp4" poster="static/img/teaser_poster.jpg" controls muted playsinline preload="metadata"></video>
+      <video class="teaser-video media" src="static/video/teaser.mp4" poster="static/img/teaser_poster.jpg" controls muted playsinline preload="metadata"></video>
     </section>
 
     <section id="try">
       <h2>Try it</h2>
       <p class="lede">Every level is a prefix of the same compressed file. Going up decodes the next chunks and adds their primitives;
         going down draws fewer of them. There is no second model to load. Drag the slider, or watch it move by itself.</p>
-      <div class="switcher" id="switcher">
+      <div class="switcher media" id="switcher">
         <div class="sw-frame" id="swFrame">
           <img src="static/img/switch_L0.webp" alt="Bicycle at level 0">
           <img src="static/img/switch_L1.webp" alt="">
@@ -371,6 +373,8 @@
     <section id="tldr">
       <h2>In short</h2>
       <p class="lede">Most codecs for splat-based radiance fields are single-rate: one optimized model per bitrate. GoDe gives the whole rate&ndash;distortion curve from one model.</p>
+      <img class="overview media" src="static/img/overview.webp" width="2000" height="1126"
+           alt="One hierarchical splat model decoded at levels of detail 0, 1, 2 and 7, with frame rate, PSNR and size">
       <div class="pillars">
         <div class="pillar"><div class="word">SCALABLE</div><div class="big">8 levels</div>
           <p>from one model (up to 32 in the ablations); each level is a prefix of the same compressed file.</p></div>
@@ -421,7 +425,7 @@
         <div class="seg" id="lodDatasets"></div>
       </div>
       <div class="chips" id="lodScenes"></div>
-      <div class="explorer">
+      <div class="explorer media">
         <div class="lod-frame" id="lodFrame"><span class="lod-tag" id="lodTag">LoD 0</span></div>
         <div class="panel">
           <div class="label">LEVEL</div>
